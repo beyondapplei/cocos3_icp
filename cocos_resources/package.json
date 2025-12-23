@@ -1,0 +1,23 @@
+{
+  "name": "cocos-icp-wallet",
+  "version": "1.0.0",
+  "description": "ICP Wallet in Cocos Creator",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@dfinity/agent": "^2.4.1",
+    "@dfinity/auth-client": "^2.4.1",
+    "@dfinity/candid": "^2.4.1",
+    "@dfinity/principal": "^2.4.1",
+    "ethers": "^6.13.5",
+    "buffer": "^6.0.3",
+    "process": "^0.11.10",
+    "events": "^3.3.0",
+    "assert": "^2.1.0",
+    "util": "^0.12.5"
+  }
+}

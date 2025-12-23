@@ -1,0 +1,13 @@
+{
+  "name": "hello_world",
+  "scripts": {
+    "build": "npm run build --if-present",
+    "prebuild": "npm run prebuild --if-present",
+    "dev": "npm run dev --if-present"
+  },
+  "type": "module",
+  "dependencies": {
+    "borc": "^3.0.0",
+    "ethers": "^5.7.2"
+  }
+}

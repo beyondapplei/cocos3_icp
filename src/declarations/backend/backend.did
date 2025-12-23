@@ -1,0 +1,6 @@
+service : {
+  get_eth_public_key: () -> (blob);
+  greet: (text) -> (text) query;
+  setGreeting: (text) -> ();
+  sign: (blob) -> (blob);
+}
