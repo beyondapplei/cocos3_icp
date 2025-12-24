@@ -1,6 +1,7 @@
 
-import { _decorator, Component, Label, Button, ScrollView, Camera, Node, log ,Sprite} from 'cc';
-const {ccclass, property} = _decorator;
+import * as cc from 'cc';
+
+const {ccclass, property} = cc._decorator;
 
 import UIPanel from "./UIPanel"
 import UIManager from "../UIManager";
@@ -11,11 +12,11 @@ import {ECMDID, ESceneType, EUIPanelType, EUnitType} from "../CommonEnum";
 export default class HomePanel extends UIPanel{
     
 
-    @property(Label)
-    labelpid: Label;
+    @property(cc.Label)
+    labelpid: cc.Label;
 
-    @property(Sprite)
-    sprole: Sprite
+    @property(cc.Sprite)
+    sprole: cc.Sprite
     
     onLoad(){
 
@@ -29,11 +30,10 @@ export default class HomePanel extends UIPanel{
 
 
          const btnBeginNode = this.node.getChildByName('btnbegin');
-         btnBeginNode.on(Node.EventType.TOUCH_END, this.clickLogin.bind(this,109825),this);
+         btnBeginNode.on(cc.Node.EventType.TOUCH_END, this.clickLogin.bind(this,109825),this);
 
-//        //此界面用的是homepanel.prefab
-        // const labelpidNode = this.node.getChildByName('labelpid');
-        // this.labelpid = labelpidNode.getComponent(cc.Label);
+        const labelpidNode = this.node.getChildByName('labelpid');
+        this.labelpid = labelpidNode.getComponent(cc.Label);
 
         // const sproleNode = this.node.getChildByName('sprole');
         // this.sprole = sproleNode.getComponent(cc.Sprite);
@@ -58,10 +58,10 @@ export default class HomePanel extends UIPanel{
     }
     
     showinfo( strMsg: string){
-         log("HomePanel: showinfo " + strMsg);
+         cc.log("HomePanel: showinfo " + strMsg);
         // UIManager.ShowTip( strMsg);
     }
-//   //login
+
     login() {
         LoginManager.Instance.login(
         () => this.handleLoginSuccess(),

@@ -1,5 +1,5 @@
-import { _decorator, Component, Label, Button, ScrollView, Camera, Node, log } from 'cc';
-const {ccclass, property} = _decorator;
+import * as cc from 'cc';
+const {ccclass, property} = cc._decorator;
 
 import UIManager from "../UIManager";
 import ResManager from "../ResManager";
@@ -10,19 +10,19 @@ import {ECMDID, ESceneType, EUIPanelType, EUnitType} from "../CommonEnum";
 import AppManager from "../mg/AppkManager";
 
 @ccclass('GameApp')
-export default class GameApp extends Component {
-    @property(Label)
-    label: Label | null = null;
-    @property(Button)
-    btnBegin: Button | null = null;
+export default class GameApp extends cc.Component {
+    @property(cc.Label)
+    label: cc.Label | null = null;
+    @property(cc.Button)
+    btnBegin: cc.Button | null = null;
 //    //@property(cc.Sprite)
 //    //spriteAd: cc.Sprite = null;
 //    //cdcd:number;
-    @property(ScrollView)
-    scrollViewA: ScrollView | null = null;
+    @property(cc.ScrollView)
+    scrollViewA: cc.ScrollView | null = null;
     @property
     text: string = 'wangbin,123,ujh';
-    mainCamera: Camera;
+    mainCamera: cc.Camera;
     gameInit()
     {
         ResManager.Instance.Init();
@@ -43,7 +43,7 @@ export default class GameApp extends Component {
 
         let btnBeginNode = this.node.getChildByName('btnbegin');
 
-        btnBeginNode.on(Node.EventType.TOUCH_END, this.clickBegin.bind(this,125), this);
+        btnBeginNode.on(cc.Node.EventType.TOUCH_END, this.clickBegin.bind(this,125), this);
 
 //        //let nodeLogo = this.node.getChildByName('background');
 //        //let actionScale = cc.scaleTo(2,1);
@@ -64,7 +64,7 @@ export default class GameApp extends Component {
     }
     testCallback(strParam)
     {
-        log(strParam)
+        cc.log(strParam)
     }
     start () {
 //        // init logic
