@@ -2,8 +2,8 @@
 import * as cc from 'cc';
 import { _decorator, log, Node, instantiate, BlockInputEvents, assetManager, resources, director } from 'cc';
 
-import UIPanel from "./ui/UIPanel"
-import {ESceneType} from "./CommonEnum";
+import UIPanel from "../ui/UIPanel"
+import {ESceneType} from "../CommonEnum";
 import ResManager from "./ResManager";
 
 export default class UIManager {

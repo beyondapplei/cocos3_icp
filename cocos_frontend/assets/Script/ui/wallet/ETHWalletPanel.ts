@@ -2,7 +2,7 @@ import { _decorator, EditBox, Label } from 'cc';
 const {ccclass, property} = _decorator;
 
 import UIPanel from "../UIPanel"
-import UIManager from "../../UIManager";
+import UIManager from "../../mg/UIManager";
 import { EUIPanelType } from "../../CommonEnum";
 import LoginManager from "../../mg/LoginManager";
 import ETHManager from "../../mg/ETHManager";

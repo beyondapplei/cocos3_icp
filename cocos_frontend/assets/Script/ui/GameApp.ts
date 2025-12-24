@@ -1,11 +1,10 @@
 import * as cc from 'cc';
 const {ccclass, property} = cc._decorator;
 
-import UIManager from "../UIManager";
-import ResManager from "../ResManager";
-import EventManager from "../EventManager";
-import BWUnitManager from "../BWUnitManager";
-import WangbinTest from "../WangbinTest";
+import UIManager from "../mg/UIManager";
+import ResManager from "../mg/ResManager";
+import EventManager from "../mg/EventManager";
+
 import {ECMDID, ESceneType, EUIPanelType, EUnitType} from "../CommonEnum";
 import AppManager from "../mg/AppkManager";
 

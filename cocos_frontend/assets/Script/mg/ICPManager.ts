@@ -3,7 +3,7 @@
 import * as cc from 'cc';
 
 import { _decorator } from 'cc';
-import UIManager from "../UIManager";
+import UIManager from "../mg/UIManager";
 import LoginManager from "./LoginManager";
 import { DFX_NETWORK, LEAGER_ICP_ID_LOCAL } from "./DefData";
 const DfinityAgent = (window as any).DfinityAgent;

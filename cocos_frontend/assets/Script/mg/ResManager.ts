@@ -1,7 +1,7 @@
 import { _decorator, resources } from 'cc';
-import UIPanel from "./ui/UIPanel"
-import {EUIPanelType} from "./CommonEnum";
-import {UIPanelTab,SkillTab, FunctionTab,CoinTab} from "./TableStruct";
+import UIPanel from "../ui/UIPanel"
+import {EUIPanelType} from "../CommonEnum";
+import {UIPanelTab,SkillTab, FunctionTab,CoinTab} from "../TableStruct";
 
 export default class ResManager {
     toRead(strParam:string, strType:string):any

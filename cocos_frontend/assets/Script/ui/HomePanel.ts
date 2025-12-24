@@ -4,7 +4,7 @@ import * as cc from 'cc';
 const {ccclass, property} = cc._decorator;
 
 import UIPanel from "./UIPanel"
-import UIManager from "../UIManager";
+import UIManager from "../mg/UIManager";
 import LoginManager from "../mg/LoginManager";
 import {ECMDID, ESceneType, EUIPanelType, EUnitType} from "../CommonEnum";
 

@@ -11,10 +11,10 @@ import { _decorator, Label, Button, RichText, EditBox, Node, log } from 'cc';
 const {ccclass, property} = _decorator;
 
 import UIPanel from "./UIPanel"
-import UIManager from "../UIManager";
+import UIManager from "../mg/UIManager";
 import { EUIPanelType } from "../CommonEnum";
 import {TableView,CellData} from "./TableView";
-import ResManager from "../ResManager";
+import ResManager from "../mg/ResManager";
 class MyCellData extends CellData{
     labName:Label;
     btnIcon:Button;

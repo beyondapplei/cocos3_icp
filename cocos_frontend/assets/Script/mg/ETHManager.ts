@@ -1,5 +1,5 @@
 import { _decorator } from 'cc';
-import UIManager from "../UIManager";
+import UIManager from "../mg/UIManager";
 import LoginManager from "./LoginManager";
 import { DFX_NETWORK } from "./DefData";
 import { ethers } from 'ethers';

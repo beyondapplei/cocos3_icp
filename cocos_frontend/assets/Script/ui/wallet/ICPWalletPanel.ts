@@ -2,10 +2,10 @@ import { _decorator, EditBox, Label } from 'cc';
 const {ccclass, property} = _decorator;
 
 import UIPanel from "../UIPanel"
-import UIManager from "../../UIManager";
+import UIManager from "../../mg/UIManager";
 import { EUIPanelType } from "../../CommonEnum";
 import {TableView,CellData} from "../TableView";
-import ResManager from "../../ResManager";
+import ResManager from "../../mg/ResManager";
 import ICPManager from "../../mg/ICPManager";
 import LoginManager from "../../mg/LoginManager";
 import { LEAGER_ICP_ID_LOCAL } from "../../mg/DefData";

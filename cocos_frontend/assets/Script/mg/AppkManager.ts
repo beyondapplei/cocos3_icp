@@ -1,6 +1,6 @@
 import { _decorator } from 'cc';
 import BackManager from "./BackManager";
-import UIManager from ".././UIManager";
+import UIManager from "../mg/UIManager";
 import LoginManager from "./LoginManager";
 import ICPManager from "./ICPManager";
 import { BACKEND_CANISTER_ID_LOCAL_FALLBACK } from "./DefData";
