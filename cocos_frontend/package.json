@@ -1,0 +1,11 @@
+{
+  "name": "cocos3_icp",
+  "uuid": "9fc26ea5-4790-4764-b8d9-32ca5ffec8af",
+  "creator": {
+    "version": "3.8.8"
+  },
+  "dependencies": {
+    "@icp-sdk/auth": "^5.0.0",
+    "@icp-sdk/core": "^5.0.0"
+  }
+}
