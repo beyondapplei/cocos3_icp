@@ -1,8 +1,11 @@
 import { _decorator, Node, Component, ScrollView, instantiate, Vec2 } from 'cc';
 const {ccclass, property} = _decorator;
 
+@ccclass('TableView')
 export  class TableView extends Component {
+    @property(Node)
     scrollViewNode: Node | null = null;
+    @property(Node)
     nodeElement: Node | null = null;
     nAllNum:number = 0;
     scrollView:ScrollView | null = null;

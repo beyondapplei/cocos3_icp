@@ -8,13 +8,13 @@ import ResManager from "./ResManager";
 export default class UIManager {
     public static readonly Instance: UIManager = new UIManager();
     public static OpenPanel(nPanelId: number, strParam?: string) {
-        // UIManager.Instance.OpenPanel(nPanelId, strParam);
+         UIManager.Instance.OpenPanel(nPanelId, strParam);
     }
     
     public static ShowTip(strTip: string)
     {
         log('UIManager ShowTip='+strTip);
-        UIManager.Instance.showtip(strTip);
+        //UIManager.Instance.showtip(strTip);
     }
     private constructor(){
     }
@@ -23,20 +23,20 @@ export default class UIManager {
     appRootNode: Node;
     tipNode: Node;
     onLoadEnd(err, res){
-//        // for(let key in res.json){
-//        //     let nKey = parseInt(key);
-//        //     cc.log(key)
-//        //     this.mapScendName[nKey] = res.json[key];
-//        // }
-//        // cc.log('loadresendforfend')
-//        // for(let key in this.mapScendName){
-//        //     cc.log('www'+key+ this.mapScendName[key])
-//        // }
+       for(let key in res.json){
+           let nKey = parseInt(key);
+           cc.log(key)
+           this.mapScendName[nKey] = res.json[key];
+       }
+       cc.log('loadresendforfend')
+       for(let key in this.mapScendName){
+           cc.log('www'+key+ this.mapScendName[key])
+       }
     }
     Init(appRootNode: Node){
-        // this.appRootNode = appRootNode;
+         this.appRootNode = appRootNode;
 
-        // this.createTipNode();
+         this.createTipNode();
     }
     loadPanel()
     {
@@ -50,7 +50,7 @@ export default class UIManager {
         let uiPanelTab = ResManager.Instance.mapUIPanelTab[nPanelId];
         if(uiPanelTab.nRemove === 1)
         {
-            this.appRootNode.removeAllChildren(false);
+            this.appRootNode.removeAllChildren();
         }
         let panel = this.mapUIPanel[nPanelId]
         if(panel != null)
@@ -86,7 +86,7 @@ export default class UIManager {
         {
             return;
         }
-        panel.node.removeFromParent(false);
+        panel.node.removeFromParent();
         panel.OnClose();
     }
     loadScene(nType:ESceneType)

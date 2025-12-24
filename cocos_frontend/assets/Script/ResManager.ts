@@ -1,4 +1,4 @@
-import { _decorator } from 'cc';
+import { _decorator, resources } from 'cc';
 import UIPanel from "./ui/UIPanel"
 import {EUIPanelType} from "./CommonEnum";
 import {UIPanelTab,SkillTab, FunctionTab,CoinTab} from "./TableStruct";
@@ -45,37 +45,35 @@ export default class ResManager {
         'coin': [CoinTab, this.mapCoinTab],
     };
     onLoadTabEnd(err, res){
-        // cc.log('onLoadTabEnd='+res.name);
+        console.log('onLoadTabEnd=' + (res && res.name));
 
-        // let strContent: string = res.text;
-        // let vstrArray: string[] = strContent.split('\r\n');
-        // let vstrTitleType: string[] = vstrArray[0].split(',')
-        // let vstrTitle: string[] = vstrArray[1].split(',')
+        let strContent: string = res.text;
+        let vstrArray: string[] = strContent.split('\r\n');
+        let vstrTitleType: string[] = vstrArray[0].split(',')
+        let vstrTitle: string[] = vstrArray[1].split(',')
 
-        // let tabAny = this.mapNameTabData[res.name][0];
-        // let mapData = this.mapNameTabData[res.name][1]
+        let tabAny = this.mapNameTabData[res.name][0];
+        let mapData = this.mapNameTabData[res.name][1]
 
-        // for(let nIndex=2; nIndex<vstrArray.length; ++nIndex)
-        // {
-        // let vstrLine: Array<string> = vstrArray[nIndex].split(',')
-        // let uiPanelTab = new tabAny();
-        // for(let nIndexLine=0; nIndexLine<vstrTitleType.length; ++nIndexLine)
-        // {
-        // let strTitleName = vstrTitle[nIndexLine]
-        // let strTitleType = vstrTitleType[nIndexLine]
-        // uiPanelTab[strTitleName] = this.toRead(vstrLine[nIndexLine], strTitleType)
-        // }
-        // mapData[uiPanelTab.nId] = uiPanelTab;
+        for(let nIndex=2; nIndex<vstrArray.length; ++nIndex)
+        {
+            let vstrLine: Array<string> = vstrArray[nIndex].split(',')
+            let uiPanelTab = new tabAny();
+            for(let nIndexLine=0; nIndexLine<vstrTitleType.length; ++nIndexLine)
+            {
+            let strTitleName = vstrTitle[nIndexLine]
+            let strTitleType = vstrTitleType[nIndexLine]
+            uiPanelTab[strTitleName] = this.toRead(vstrLine[nIndexLine], strTitleType)
+            }
+        mapData[uiPanelTab.nId] = uiPanelTab;
 
-        // }
-//        //let uiTab:UIPanelTab = this.mapUIPanelTab[2];
-//        //cc.log('table='+uiTab.strName)
+        }
     }
     Init(){
-        // for(let key in this.mapNameTabData)
-        // {
-        // cc.resources.load( key, this.onLoadTabEnd.bind(this));
-        // }
+        for(let key in this.mapNameTabData)
+        {
+            resources.load(key, this.onLoadTabEnd.bind(this));
+        }
     }
 }
 

@@ -11,9 +11,9 @@ export default class AppManager {
     }
  
     Init(){
-        // LoginManager.Instance.Init();
-        // BackManager.Instance.Init();
-        // ICPManager.Instance.Init();
+        LoginManager.Instance.Init();
+        BackManager.Instance.Init();
+        ICPManager.Instance.Init();
 
     }
     showTip(strTip: string)
@@ -22,7 +22,7 @@ export default class AppManager {
     }
     GetBackendCanisterId(): string  {
 
-        // return BACKEND_CANISTER_ID_LOCAL_FALLBACK;
+         return BACKEND_CANISTER_ID_LOCAL_FALLBACK;
 
     }
 }

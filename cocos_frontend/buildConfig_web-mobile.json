@@ -9,7 +9,7 @@
   "mangleProperties": false,
   "md5Cache": false,
   "skipCompressTexture": false,
-  "sourceMaps": false,
+  "sourceMaps": true,
   "overwriteProjectSettings": {
     "includeModules": {
       "gfx-webgl2": "on",

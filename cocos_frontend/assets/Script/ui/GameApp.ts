@@ -1,4 +1,4 @@
-import { _decorator, Component, Label, Button, ScrollView, Camera, log } from 'cc';
+import { _decorator, Component, Label, Button, ScrollView, Camera, Node, log } from 'cc';
 const {ccclass, property} = _decorator;
 
 import UIManager from "../UIManager";
@@ -30,7 +30,7 @@ export default class GameApp extends Component {
         UIManager.Instance.Init(uirootnode);
         EventManager.Instance.Init();
         AppManager.Instance.Init();
-//        //BWUnitManager.Instance.Init();
+
     }
     onLoad(){
         // cc.loader.loadRes( "texture/head1", cc.SpriteFrame);
@@ -39,24 +39,11 @@ export default class GameApp extends Component {
 
         // cc.log('wangbin onLoa1 ');
 
-        // this.gameInit();
+        this.gameInit();
 
-        // this.mainCamera = this.node.getChildByName('Main Camera').getComponent(cc.Camera);
+        let btnBeginNode = this.node.getChildByName('btnbegin');
 
-//        //EventManager.Instance.AddEvent(ECMDID.LOGIN, this, this.testCallback);
-//        //EventManager.Instance.RemoveEvent(ECMDID.LOGIN, this, this.start)
-//        //EventManager.Instance.FireEvent(ECMDID.LOGIN, 'wangbin');
-
-        // let btnBeginNode = this.node.getChildByName('btnbegin');
-//        // this.btnBegin.node.on(cc.Node.EventType.TOUCH_START, function (event) {
-//        //     console.log("TOUCH_START")
-//        // });
-
-//        // this.btnBegin.node.on(cc.Node.EventType.TOUCH_MOVE, function (event) {
-//        //     console.log("TOUCH_MOVE")
-//        // });
-
-        // btnBeginNode.on(cc.Node.EventType.TOUCH_END, this.clickBegin.bind(this,125),this);
+        btnBeginNode.on(Node.EventType.TOUCH_END, this.clickBegin.bind(this,125), this);
 
 //        //let nodeLogo = this.node.getChildByName('background');
 //        //let actionScale = cc.scaleTo(2,1);
@@ -69,7 +56,7 @@ export default class GameApp extends Component {
     clickBegin(nTag){
         // cc.log('gameapp clickbegin'+nTag);
         // cc.log(this.text+'=beginclickthis');
-        // UIManager.Instance.OpenPanel(EUIPanelType.HOME); //tables 列表
+         UIManager.Instance.OpenPanel(EUIPanelType.HOME); //tables 列表
     }
     onDestroy(){
 //         //EventManager.Instance.RemoveEvent(ECMDID.LOGIN, this, this.testCallback)

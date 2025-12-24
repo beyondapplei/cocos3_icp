@@ -18,11 +18,9 @@ export default class TipPanel extends Component {
         // cc.log('wangbin onLoa1 ');
 
 
-//        //EventManager.Instance.AddEvent(ECMDID.LOGIN, this, this.testCallback);
-//        //EventManager.Instance.RemoveEvent(ECMDID.LOGIN, this, this.start)
-//        //EventManager.Instance.FireEvent(ECMDID.LOGIN, 'wangbin');
 
-        // this.labelpid = this.node.getChildByName('labelpid').getComponent(cc.Label);
+
+         this.labelpid = this.node.getChildByName('labelpid').getComponent(Label);
 
 
     }
