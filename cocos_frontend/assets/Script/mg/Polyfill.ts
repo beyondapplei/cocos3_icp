@@ -1,7 +1,8 @@
 import { Principal, base32Encode, getCrc32 } from '@icp-sdk/core/principal';
 
-// 更“正确”的修复：不改第三方库文件，而是在运行时修补 Principal.toText。
-// 原因：某些构建链会把 `[...u8a]` 错误转成 `[].concat(u8a)`，对 TypedArray 不会展开元素，导致 checksum 计算失败。
+// 修复某些打包/转译把 `[...u8a]` 变成 `[].concat(u8a)` 的问题。
+// 对 TypedArray 来说，Array#concat 不会展开其元素，会把整个对象当成一个元素，
+// 进而导致 `new Uint8Array([].concat(u8a1, u8a2))` 得到全 0，触发 Principal checksum 校验失败。
 (() => {
     const g: any = (typeof globalThis !== 'undefined')
         ? globalThis
@@ -64,6 +65,6 @@ if (typeof BigInt !== 'undefined') {
             }
             return globalMath.__originalPow(base, exponent);
         };
-        console.log("Math.pow patched for BigInt support");
+        // console.log("Math.pow patched for BigInt support");
     }
 }
