@@ -5,6 +5,7 @@
 //         //this.labPriceScale = this.node.getChildByName('labelpricescale').getComponent(cc.Label);
 // //-===========================================
 
+import * as cc from 'cc';
 import { _decorator, Label, Button, RichText, EditBox, Node, log } from 'cc';
 const {ccclass, property} = _decorator;
 

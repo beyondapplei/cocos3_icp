@@ -1,5 +1,7 @@
 // // Revert to bundled file
 
+import * as cc from 'cc';
+
 import { _decorator } from 'cc';
 import UIManager from "../UIManager";
 import LoginManager from "./LoginManager";

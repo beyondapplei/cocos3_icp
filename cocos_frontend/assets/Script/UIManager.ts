@@ -1,6 +1,7 @@
 // //import LoginPanel from "./LoginPanel";
-
+import * as cc from 'cc';
 import { _decorator, log, Node, instantiate, BlockInputEvents, assetManager, resources, director } from 'cc';
+
 import UIPanel from "./ui/UIPanel"
 import {ESceneType} from "./CommonEnum";
 import ResManager from "./ResManager";
@@ -13,15 +14,15 @@ export default class UIManager {
     
     public static ShowTip(strTip: string)
     {
-        log('UIManager ShowTip='+strTip);
+        cc.log('UIManager ShowTip='+strTip);
         //UIManager.Instance.showtip(strTip);
     }
     private constructor(){
     }
     mapUIPanel: {[key: number]: UIPanel} = {};
     mapScendName: {[key: number]: string} = {};
-    appRootNode: Node;
-    tipNode: Node;
+    appRootNode: cc.Node;
+    tipNode: cc.Node;
     onLoadEnd(err, res){
        for(let key in res.json){
            let nKey = parseInt(key);
@@ -33,7 +34,7 @@ export default class UIManager {
            cc.log('www'+key+ this.mapScendName[key])
        }
     }
-    Init(appRootNode: Node){
+    Init(appRootNode: cc.Node){
          this.appRootNode = appRootNode;
 
          this.createTipNode();
@@ -64,8 +65,8 @@ export default class UIManager {
         }
         function  onLoadPrefabEnd(err, prefab)
         {
-            let prefabNode: cc.Node = instantiate(prefab);
-            prefabNode.addComponent(BlockInputEvents);
+            let prefabNode: cc.Node = cc.instantiate(prefab);
+            prefabNode.addComponent(cc.BlockInputEvents);
             let panel = prefabNode.addComponent(uiPanelTab.strName);
             this.appRootNode.addChild(panel.node);
             panel.OnOpen( strParam);

@@ -1,37 +1,34 @@
-//         //this.nOrderState = 0;
-//         //super.init();
-//        //this.labPriceLow = this.node.getChildByName('labelpricelow').getComponent(cc.Label);
-//         //this.labPriceHi = this.node.getChildByName('labelpricecur').getComponent(cc.Label);
-//         //this.labPriceScale = this.node.getChildByName('labelpricescale').getComponent(cc.Label);
-// //-===========================================
 
-import { _decorator, Label, Button, RichText, EditBox, Node, log } from 'cc';
-const {ccclass, property} = _decorator;
+import * as cc from 'cc';
+const {ccclass, property} = cc._decorator;
 
 import UIPanel from "./UIPanel"
 import UIManager from "../UIManager";
 import { EUIPanelType } from "../CommonEnum";
 import {TableView,CellData} from "./TableView";
 import ResManager from "../ResManager";
+
+
 class HomeListData extends CellData{
-    labName:Label;
-    btnIcon:Button;
-    labContent:RichText;
+    labName:cc.Label;
+    btnIcon:cc.Button;
+    labContent:cc.RichText;
     nOldBgHeight:number;
-    labPriceLow:Label;
-    labPriceHi:Label;
-    labPriceScale:Label;
-    labCap:Label;
+    labPriceLow:cc.Label;
+    labPriceHi:cc.Label;
+    labPriceScale:cc.Label;
+    labCap:cc.Label;
+    
     init(node){
         this.node = node;
-        this.btnIcon = this.node.getChildByName('btnicon').getComponent(Button);
-          this.labName = this.btnIcon.node.getChildByName('labelname').getComponent(Label);
-        this.labCap = this.btnIcon.node.getChildByName('labelcap').getComponent(Label);
+        this.btnIcon = this.node.getChildByName('btnicon').getComponent(cc.Button);
+          this.labName = this.btnIcon.node.getChildByName('labelname').getComponent(cc.Label);
+        this.labCap = this.btnIcon.node.getChildByName('labelcap').getComponent(cc.Label);
         this.nOldBgHeight = this.node.height;
     }
     refreshUI(info:ListCellData){
-        this.labName.string = info.nId.toString();//sName
-        this.labCap.string = info.sName
+        this.labName.string = info.sName;//sName
+        this.labCap.string = info.nId.toString()
     }
 }
 class ListCellData{
@@ -44,37 +41,24 @@ export default class HomeListPanel extends UIPanel {
     tableview: TableView;
     vListData: ListCellData[] = [];
     heightCell: HomeListData;
-    editBox: EditBox;
+    editBox: cc.EditBox;
     nIndexReq: number;
     nOrderState: number;
     onLoad(){
-        // this.nOrderState = 0;
+        
 
-        // this.nIndexReq = 0
-//        // let btnBeginNode = this.node.getChildByName('btnback');
-//        // btnBeginNode.on(cc.Node.EventType.TOUCH_END, this.clickBegin.bind(this,109825),this);
+        this.tableview = this.node.getChildByName('tableview').getComponent(TableView);
+        this.tableview.setRefreshCellCallBack(this, this.refreshCell, this.getCellHeight);
 
-//        // let btnOrder = this.node.getChildByName('btnorder');
-//        // btnOrder.on(cc.Node.EventType.TOUCH_END, this.clickOrder.bind(this,1025),this);
-
-
-        // this.tableview = this.node.getChildByName('tableview').getComponent(TableView);
-        // this.tableview.setRefreshCellCallBack(this, this.refreshCell, this.getCellHeight);
-
-        // this.tableview.nodeElement.active = false;
+        this.tableview.nodeElement.active = false;
 
     }
     start () {
     }
     RefreshUI(){
-        // this.tableview.reloadData(this.vListData.length);
+         this.tableview.reloadData(this.vListData.length);
     }
-   
-    UpdateCurPrice(strSymbol:string,nPriceCur:number){
-        // let mapCoinTab = ResManager.Instance.mapCoinTab
 
-
-    }
   
     OnResult(strResponseText:string){
         // cc.log("OnResult");
@@ -88,23 +72,19 @@ export default class HomeListPanel extends UIPanel {
     }
  
     RefreshData() {
-        // this.nIndexReq = 0
-        // this.vListData = []
 
-//        //for(nindex)
+        let vName = ["多链钱包","veKeys","世界广场","官方singer","oisy-wallet","跨链桥eth-cketh","X402","wallet8","wallet9","wallet10",
+        "wallet11","wallet12","wallet13","wallet14","wallet15","wallet16","wallet17","wallet18","wallet19","wallet20"];
 
-        // let vName = ["多链钱包","veKeys","世界广场","官方singer","oisy-wallet","跨链桥eth-cketh","X402","wallet8","wallet9","wallet10",
-        // "wallet11","wallet12","wallet13","wallet14","wallet15","wallet16","wallet17","wallet18","wallet19","wallet20"];
-
-//        //写个循环创建20个数据
-        // for(let i = 1; i <= vName.length; i++) {
-        // let cellInfo = new ListCellData();
-        // cellInfo.nId = i;
-        // cellInfo.sName = vName[i-1];
+       //写个循环创建20个数据
+        for(let i = 1; i <= vName.length; i++) {
+        let cellInfo = new ListCellData();
+        cellInfo.nId = i;
+        cellInfo.sName = vName[i-1];
 
 
-        // this.vListData.push(cellInfo);
-        // }
+         this.vListData.push(cellInfo);
+         }
 
 
     }
@@ -132,9 +112,9 @@ export default class HomeListPanel extends UIPanel {
             let node = this.tableview.createElementNode();
             node.active = true;
             cellData.init(node);
-            cellData.btnIcon.node.on(Node.EventType.TOUCH_END, this.clickCell.bind(this,cellData.btnIcon),this);
+            cellData.btnIcon.node.on(cc.Node.EventType.TOUCH_END, this.clickCell.bind(this,cellData.btnIcon),this);
         }
-        log('refreshCell'+nIndex);
+        cc.log('refreshCell'+nIndex);
         let cellInfo = this.vListData[nIndex];
         cellData.refreshUI(cellInfo);
         cellData.btnIcon.nTag = nIndex;
@@ -144,7 +124,7 @@ export default class HomeListPanel extends UIPanel {
     clickCell(btnIcon)
     {
         let nIndex = btnIcon.nTag;
-        log('clickcell='+nIndex);
+        cc.log('clickcell='+nIndex);
         let nId = this.vListData[nIndex].nId;
         if(nId === 1 )
         {

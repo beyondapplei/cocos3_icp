@@ -1,4 +1,5 @@
 import { _decorator, Node, Component, ScrollView, instantiate, Vec2 } from 'cc';
+import * as cc from 'cc';
 const {ccclass, property} = _decorator;
 
 @ccclass('TableView')
@@ -78,7 +79,7 @@ export  class TableView extends Component {
         }
         let nHeight = this._vCellsPositions[this.nAllNum];
 //         //let contentWidth = this.scrollView.content.getContentSize().width;
-        let nTableViewHeight = this.scrollViewNode.getContentSize().height;
+        let nTableViewHeight = this.scrollViewNode.height;
         if(nHeight < nTableViewHeight)
         {
             nHeight = nTableViewHeight;
@@ -92,7 +93,7 @@ export  class TableView extends Component {
         {
             let cell = this._cellsUsed[nIndex];
             this._cellsFreed.push(cell);
-            cell.node.removeFromParent(false);
+            cell.node.removeFromParent();
         }
         this._indices = {};
         this._cellsUsed = [];
@@ -241,11 +242,10 @@ export  class TableView extends Component {
     }
 }
 
-@ccclass('TableView')
-    @property(cc.Node)    @property(cc.Node)
+@ccclass('CellData')
 export class CellData{
     nId:number;
-    node:Node;
+    node:cc.Node;
 }
 
 

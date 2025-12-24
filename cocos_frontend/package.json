@@ -14,4 +14,8 @@
     "@icp-sdk/auth": "^5.0.0",
     "@icp-sdk/core": "^5.0.0"
   }
+  ,
+  "scripts": {
+    "debug": "npx http-server build/web-mobile -p 8080 -c-1"
+  }
 }

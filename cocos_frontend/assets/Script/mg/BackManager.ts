@@ -1,5 +1,7 @@
 // // import DfinityAgent = require("../Lib/dfinity-agent-wrapper");
 
+import * as cc from 'cc';
+
 import { _decorator } from 'cc';
 import LoginManager from "./LoginManager";
 import { ethers } from "ethers";

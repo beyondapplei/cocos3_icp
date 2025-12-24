@@ -84,7 +84,7 @@ export default class HomePanel extends UIPanel{
         this.showinfo("Login Success!");
         }
 
-        // UIManager.OpenPanel(EUIPanelType.HOMELIST); //tables 列表
+        UIManager.OpenPanel(EUIPanelType.HOMELIST); //tables 列表
     }
 //    // async onGetAddressClick() {
 //    //     const principal = LoginManager.Instance.getPrincipalText();
