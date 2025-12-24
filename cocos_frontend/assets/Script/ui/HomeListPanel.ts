@@ -48,10 +48,10 @@ export default class HomeListPanel extends UIPanel {
     onLoad(){
         
 
-        // this.tableview = this.node.getChildByName('tableview').getComponent(TableView);
-        // this.tableview.setRefreshCellCallBack(this, this.refreshCell, this.getCellHeight);
+        this.tableview = this.node.getChildByName('tableview').getComponent(TableView);
+        this.tableview.setRefreshCellCallBack(this, this.refreshCell, this.getCellHeight);
 
-        // this.tableview.nodeElement.active = false;
+        this.tableview.nodeElement.active = false;
 
     }
     start () {
@@ -89,8 +89,8 @@ export default class HomeListPanel extends UIPanel {
     }
     OnOpen( strParam: string)
     {
-        //this.RefreshData()
-        //this.RefreshUI()
+        this.RefreshData()
+        this.RefreshUI()
     }
     
     OnClose()

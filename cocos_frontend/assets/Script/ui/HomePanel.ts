@@ -24,7 +24,7 @@ export default class HomePanel extends UIPanel{
         // {
 
         // }
-        // cc.loader.loadRes( "texture/imagebg11", cc.SpriteFrame, onLoadTexturebEnd.bind(this));
+         //cc.assetManager.l //loadRes( "texture/imagebg11", cc.SpriteFrame, onLoadTexturebEnd.bind(this));
 //       //在scene中预加载资源 后能显示
 //       //cc.loader.loadRes( "texture/bullet", cc.SpriteFrame);
 

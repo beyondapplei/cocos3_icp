@@ -41,7 +41,7 @@ export  class TableView extends cc.Component {
         this.scrollView = this.scrollViewNode.getComponent(cc.ScrollView);
         this.scrollViewNode.on('scrolling', this.scrollViewDidScroll, this);
 
-        this.scrollViewNode.on('scrolling', this.scrollViewDidScroll, this);
+       // this.scrollViewNode.on('scrolling', this.scrollViewDidScroll, this);
     }
     
     indexFromOffset(search: number)
@@ -243,20 +243,48 @@ export  class TableView extends cc.Component {
             return null;
         }
         else {
-            let cell = this._cellsFreed[0];
-            this._cellsFreed.splice(0,1)
+            const cell = this._cellsFreed.shift();
             return cell;
         }
     }
 
     updateCellAtIndex( idx:number)
     {
-        //let cellData = this.dequeueCell();
+        // obtain a cell (from pool or newly created)
+        let cellData = this.dequeueCell();
 
-        let cellData = this.refreshCellCallBack.call(this.target,idx)
+        // allow refresh callback to return a fully prepared cell
+        let cbResult = null;
+        if (this.refreshCellCallBack) {
+            cbResult = this.refreshCellCallBack.call(this.target, idx);
+        }
+        // if callback returned a CellData with node, prefer it
+        if (cbResult && cbResult.node) {
+            cellData = cbResult;
+        }
+
+        if (!cellData) return;
+
         cellData.nId = idx;
-        cellData.node.setPosition(new cc.Vec2(0,-this._vCellsPositions[idx]));
-        this.scrollView.content.addChild(cellData.node);
+
+        if (!cellData.node) {
+            cellData.node = this.createElementNode();
+        }
+
+        // Safety: disable any Sprite without spriteFrame to avoid engine errors in Sliced.updateUVs
+        const sprites = cellData.node.getComponentsInChildren(cc.Sprite);
+        for (const s of sprites) {
+            if (!s || !s.spriteFrame) {
+                cc.warn('TableView: sprite missing spriteFrame at index', idx, s && s.node && s.node.name);
+                if (s) s.enabled = false;
+            }
+        }
+
+        cellData.node.setPosition(new cc.Vec3(0, -this._vCellsPositions[idx], 0));
+        if (this.scrollView && this.scrollView.content) {
+            this.scrollView.content.addChild(cellData.node);
+        }
+
         this._cellsUsed.push(cellData);
         this._indices[idx] = idx;
         this._isUsedCellsDirty = true;
