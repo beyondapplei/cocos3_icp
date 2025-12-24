@@ -1,8 +1,9 @@
 
+import "./Polyfill";
 //import EventManager from "../EventManager";
 
 import { AuthClient } from '@icp-sdk/auth/client';
-import { LocalStorage } from '@icp-sdk/auth/client';  
+//import { LocalStorage } from '@icp-sdk/auth/client';  
 
 
 //import {ECMDID} from "../CommonEnum";
@@ -71,16 +72,19 @@ export default class LoginManager {
 
         // Cocos 环境下 IndexedDB 可能不可用/数据损坏；强制使用 LocalStorage 更稳。
         try {
-            const client = await AuthClient.create({ storage: new LocalStorage() });
+            const client = await AuthClient.create();
             if (!client) throw new Error('AuthClient creation failed');
             this.authClient = client;
             return this.authClient;
         } catch (e: any) {
             const msg = (e && e.message) ? String(e.message) : String(e);
             // 常见：历史缓存 delegation/identity 损坏导致 DelegationChain.fromJSON 报错
-            if (msg.indexOf('Invalid hexadecimal string') >= 0 || msg.indexOf('DelegationChain') >= 0) {
+            // 或者是 Principal checksum 校验失败 (e.g. "Principal ... does not have a valid checksum")
+            if (msg.indexOf('Invalid hexadecimal string') >= 0 || 
+                msg.indexOf('DelegationChain') >= 0 || 
+                msg.indexOf('valid checksum') >= 0) {
                 this.clearAuthClientStorage();
-                const client = await AuthClient.create({ storage: new LocalStorage() });
+                const client = await AuthClient.create();
                 if (!client) throw new Error('AuthClient creation failed');
                 this.authClient = client;
                 return this.authClient;

@@ -5,6 +5,7 @@
   
   /* Add your custom configuration here. */
   "compilerOptions": {
+    "target": "ES2020",
     "strict": false,
     "moduleResolution": "node16"
   }

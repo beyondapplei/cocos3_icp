@@ -25,6 +25,9 @@ export default class GameApp extends Component {
     @property
     text: string = 'wangbin,123,ujh';
 
+    @property(Label)
+    labT :Label;
+
     mainCamera: Camera;
     gameInit()
     {
@@ -47,7 +50,7 @@ export default class GameApp extends Component {
     
 
         let btnBeginNode = this.node.getChildByName('btnbegin');
-       
+        this.labT = btnBeginNode.getChildByName('Label').getComponent(Label);
 
         btnBeginNode.on(Node.EventType.TOUCH_END, this.clickBegin.bind(this,125),this);
 
@@ -80,6 +83,7 @@ export default class GameApp extends Component {
         const principal = LoginManager.Instance.getPrincipalText();
         if (principal) {
             this.showinfo("Login Success! Principal: " + principal);
+            this.labT.string =  principal;
         
         } else {
             this.showinfo("Login Success!");
