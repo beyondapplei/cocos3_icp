@@ -1,9 +1,10 @@
 {
   "canisters": {
+
     "internet_identity": {
       "type": "custom",
-      "candid": "https://github.com/dfinity/internet-identity/releases/download/release-2025-12-12/internet_identity.did",
-      "wasm": "https://github.com/dfinity/internet-identity/releases/download/release-2025-12-12/internet_identity_dev.wasm.gz",
+      "candid": "https://github.com/dfinity/internet-identity/releases/download/release-2025-12-19/internet_identity.did",
+      "wasm": "https://github.com/dfinity/internet-identity/releases/download/release-2025-12-19/internet_identity_dev.wasm.gz",
       "init_arg": "(opt record { captcha_config = opt record { max_unsolved_captchas= 50:nat64; captcha_trigger = variant {Static = variant {CaptchaDisabled}}}})",
       "frontend": {}
     },
