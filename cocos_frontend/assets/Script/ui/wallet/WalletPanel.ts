@@ -1,9 +1,3 @@
-//         //this.nOrderState = 0;
-//         //super.init();
-//        //this.labPriceLow = this.node.getChildByName('labelpricelow').getComponent(cc.Label);
-//         //this.labPriceHi = this.node.getChildByName('labelpricecur').getComponent(cc.Label);
-//         //this.labPriceScale = this.node.getChildByName('labelpricescale').getComponent(cc.Label);
-// //-===========================================
 
 import * as cc from 'cc';
 import { _decorator, Label, Button, RichText, EditBox, Node, log } from 'cc';
@@ -49,33 +43,24 @@ export default class WalletPanel extends UIPanel {
     nIndexReq: number;
     nOrderState: number;
     onLoad(){
-        // this.nOrderState = 0;
-
-        // this.nIndexReq = 0
-        // let btnBeginNode = this.node.getChildByName('btnback');
-        // btnBeginNode.on(cc.Node.EventType.TOUCH_END, this.clickBegin.bind(this,109825),this);
-
-//        // let btnOrder = this.node.getChildByName('btnorder');
-//        // btnOrder.on(cc.Node.EventType.TOUCH_END, this.clickOrder.bind(this,1025),this);
+        
+        let btnBeginNode = this.node.getChildByName('btnback');
+        btnBeginNode.on(cc.Node.EventType.TOUCH_END, this.clickBegin.bind(this,109825),this);
 
 
-        // this.tableview = this.node.getChildByName('tableview').getComponent(TableView);
-        // this.tableview.setRefreshCellCallBack(this, this.refreshCell, this.getCellHeight);
+        this.tableview = this.node.getChildByName('tableview').getComponent(TableView);
+        this.tableview.setRefreshCellCallBack(this, this.refreshCell, this.getCellHeight);
 
-        // this.tableview.nodeElement.active = false;
+        this.tableview.nodeElement.active = false;
 
     }
     start () {
     }
     RefreshUI(){
-        // this.tableview.reloadData(this.vListData.length);
+        this.tableview.reloadData(this.vListData.length);
     }
    
-    UpdateCurPrice(strSymbol:string,nPriceCur:number){
-        // let mapCoinTab = ResManager.Instance.mapCoinTab
-
-
-    }
+ 
   
     OnResult(strResponseText:string){
         // cc.log("OnResult");
@@ -89,19 +74,16 @@ export default class WalletPanel extends UIPanel {
     }
  
     RefreshData() {
-        // this.nIndexReq = 0
-        // this.vListData = []
+     
+         let vFunName = ["ICP","ETH ","BTC","LTC","DOGE","XRP","BCH","EOS","ADA","XLM","LINK","DOT","YFI","USDT","USDC","DAI","WBTC","SHIB","MATIC","SOL"]
 
-//        //for(nindex)
-        // let vFunName = ["ICP","ETH ","BTC","LTC","DOGE","XRP","BCH","EOS","ADA","XLM","LINK","DOT","YFI","USDT","USDC","DAI","WBTC","SHIB","MATIC","SOL"]
-
-//        //写个循环创建20个数据
-        // for(let i = 0; i < vFunName.length; i++) {
-        // let cellInfo = new WalletCellData();
-        // cellInfo.nId = i;
-        // cellInfo.sName = vFunName[i];
-        // this.vListData.push(cellInfo);
-        // }
+       //写个循环创建20个数据
+        for(let i = 0; i < vFunName.length; i++) {
+        let cellInfo = new WalletCellData();
+        cellInfo.nId = i;
+        cellInfo.sName = vFunName[i];
+        this.vListData.push(cellInfo);
+        }
 
 
     }
@@ -149,7 +131,6 @@ export default class WalletPanel extends UIPanel {
         }
         else if(nId === 1 )
         {
-//           // UIManager.Instance.OpenPanel(EUIPanelType.GAME);
            
             UIManager.OpenPanel(EUIPanelType.WALLET_ETH);
         }
@@ -159,7 +140,7 @@ export default class WalletPanel extends UIPanel {
   
     clickBegin(nTag){
         // cc.log('clickbegin'+nTag);
-        // UIManager.Instance.OpenPanel(EUIPanelType.HOMELIST);
+         UIManager.Instance.OpenPanel(EUIPanelType.HOMELIST);
     }
     clickOrder(nTag){
 
