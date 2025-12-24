@@ -1,32 +1,38 @@
+import { Principal, base32Encode, getCrc32 } from '@icp-sdk/core/principal';
 
-// 修复某些打包/转译把 `[...u8a]` 变成 `[].concat(u8a)` 的问题。
-// 对 TypedArray 来说，Array#concat 不会展开其元素，会把整个对象当成一个元素，
-// 进而导致 `new Uint8Array([].concat(u8a1, u8a2))` 得到全 0，触发 Principal checksum 校验失败。
+// 更“正确”的修复：不改第三方库文件，而是在运行时修补 Principal.toText。
+// 原因：某些构建链会把 `[...u8a]` 错误转成 `[].concat(u8a)`，对 TypedArray 不会展开元素，导致 checksum 计算失败。
 (() => {
     const g: any = (typeof globalThis !== 'undefined')
         ? globalThis
         : (typeof window !== 'undefined' ? window : (typeof self !== 'undefined' ? self : {}));
 
-    if (!g || g.__patchedTypedArrayConcat) return;
-    g.__patchedTypedArrayConcat = true;
+    if (!g || g.__patchedPrincipalToText) return;
+    g.__patchedPrincipalToText = true;
 
-    const originalConcat = Array.prototype.concat;
+    const proto: any = (Principal as any)?.prototype;
+    if (!proto || typeof proto.toText !== 'function') return;
 
-    function isTypedArray(v: any): boolean {
-        return !!v && typeof v === 'object' && ArrayBuffer.isView(v) && !(v instanceof DataView);
-    }
-
-    // 只针对 `[].concat(typedArray, ...)` 这种模式做最小修复，避免影响其它 concat 用法。
-    Array.prototype.concat = function (...args: any[]) {
+    const originalToText = proto.toText;
+    proto.toText = function () {
         try {
-            if (Array.isArray(this) && this.length === 0 && args.some(isTypedArray)) {
-                const mapped = args.map((a) => (isTypedArray(a) ? Array.from(a as any) : a));
-                return originalConcat.apply(this, mapped as any);
-            }
+            const checksumArrayBuf = new ArrayBuffer(4);
+            const view = new DataView(checksumArrayBuf);
+            view.setUint32(0, getCrc32(this._arr));
+            const checksum = new Uint8Array(checksumArrayBuf);
+
+            const array = new Uint8Array(checksum.length + this._arr.length);
+            array.set(checksum, 0);
+            array.set(this._arr, checksum.length);
+
+            const result = base32Encode(array);
+            const matches = result.match(/.{1,5}/g);
+            if (!matches) throw new Error('Invalid principal encoding');
+            return matches.join('-');
         } catch {
-            // ignore
+            // 兜底：如果内部结构变化，回退到原实现
+            return originalToText.call(this);
         }
-        return originalConcat.apply(this, args as any);
     };
 })();
 
