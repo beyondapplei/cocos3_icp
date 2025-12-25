@@ -1,8 +1,9 @@
 import { _decorator } from 'cc';
+import '../shims/runtime';
 import UIManager from "../mg/UIManager";
 import LoginManager from "./LoginManager";
 import { DFX_NETWORK } from "./DefData";
-import { ethers } from 'ethers';
+import { ethers } from '../shims/ethers';
 import BackManager from "./BackManager";
 
 export default class ETHManager {
@@ -16,23 +17,23 @@ export default class ETHManager {
    
    
     async GetBalanceETH(ethAddress: string): Promise<string> {
-
-        // try {
-//            //https://ethereum-rpc.publicnode.com
-//            //https://ethereum-sepolia-rpc.publicnode.com
-        // if (!this.provider) {
-        // this.provider = new ethers.providers.JsonRpcProvider('https://ethereum-sepolia-rpc.publicnode.com');
-        // }
-        // const bal = await this.provider.getBalance(ethAddress);
-        // const balanceInEth = parseFloat(ethers.utils.formatEther(bal)); // 转换为 ETH
-        // return `Balance: ${balanceInEth.toFixed(6)} ETH`;
-        // } catch (e) {
-        // console.error(e);
-        // return 'Balance: error';
-        // }
+                try {
+                        if (!this.provider) {
+                                this.provider = new ethers.providers.JsonRpcProvider('https://ethereum-sepolia-rpc.publicnode.com');
+                        }
+                        const bal = await this.provider.getBalance(ethAddress);
+                        const balanceInEth = parseFloat(ethers.utils.formatEther(bal));
+                        return `Balance: ${balanceInEth.toFixed(6)} ETH`;
+                } catch (e: any) {
+                        console.error(e);
+                        return 'Balance: error';
+                }
     }
     async SendETH(fromAddr: string,toAddr: string, amountStr: string): Promise<string> {
 
+                // TODO: 后端签名 + 发送交易逻辑尚未恢复。
+                // 先返回明确错误，避免 Promise<string> 没有返回值导致运行/编译异常。
+                throw new Error('SendETH not implemented yet');
 
 
         // try {

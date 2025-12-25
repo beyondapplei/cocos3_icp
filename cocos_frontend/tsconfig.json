@@ -6,6 +6,21 @@
   "compilerOptions": {
     "target": "ES2020",
     "strict": false,
-    "moduleResolution": "node"
+    "moduleResolution": "bundler",
+    "baseUrl": ".",
+    "paths": {
+      "http": ["assets/Script/shims/empty.ts"],
+      "https": ["assets/Script/shims/empty.ts"],
+      "net": ["assets/Script/shims/empty.ts"],
+      "tls": ["assets/Script/shims/empty.ts"],
+      "fs": ["assets/Script/shims/empty.ts"],
+      "zlib": ["assets/Script/shims/empty.ts"],
+      "stream": ["node_modules/stream-browserify"],
+      "crypto": ["node_modules/crypto-browserify"],
+      "buffer": ["node_modules/buffer"],
+      "process": ["node_modules/process/browser"],
+      "util": ["node_modules/util"],
+      "assert": ["node_modules/assert"]
+    }
   }
 }

@@ -50,9 +50,13 @@ export default class TipPanel extends cc.Component {
         this.labelpid.string = strTip;
 //        // 本节点向上移动300像素，然后淡出消失（用 Tween，避免 cc.Action deprecated）
         cc.Tween.stopAllByTarget(this.node);
-        this.node.opacity = 255;
+        this.node.getComponent(cc.UIOpacity).opacity = 255;
         cc.tween(this.node)
-            .by(10, { y: 900 })
+            .by(10, { position: cc.Vec3.UP.clone().multiplyScalar(900) })
+            .call(() => {})
+            .start();
+        cc.tween(this.node.getComponent(cc.UIOpacity))
+            .delay(9)
             .to(1, { opacity: 0 })
             .call(() => this.onTipEnd())
             .start();

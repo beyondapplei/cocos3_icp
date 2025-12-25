@@ -1,16 +1,8 @@
 
 import "./Polyfill";
-//import EventManager from "../EventManager";
 
 import { AuthClient } from '@icp-sdk/auth/client';
-//import { LocalStorage } from '@icp-sdk/auth/client';  
-
-
-//import {ECMDID} from "../CommonEnum";
-
 import { DFX_NETWORK, II_CANISTER_ID_LOCAL } from "./DefData";
-
-
 
 export default class LoginManager {
     public static readonly Instance: LoginManager = new LoginManager();

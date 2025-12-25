@@ -1,4 +1,4 @@
-// //import LoginPanel from "./LoginPanel";
+
 import * as cc from 'cc';
 import { _decorator, log, Node, instantiate, BlockInputEvents, assetManager, resources, director } from 'cc';
 
@@ -69,10 +69,9 @@ export default class UIManager {
             prefabNode.addComponent(cc.BlockInputEvents);
             let panel = prefabNode.addComponent(uiPanelTab.strName);
             this.appRootNode.addChild(panel.node);
-            panel.OnOpen( strParam);
+            (panel as any).OnOpen( strParam);
             this.mapUIPanel[nPanelId] = panel;
-//            //cc.Prefab
-//            //cc.loader.releaseAsset(prefab)
+
             assetManager.releaseAsset(prefab)
         }
 //        //cc.loader.loadRes( uiPanelTab.strPrefabName, onLoadPrefabEnd.bind(this));
@@ -126,182 +125,14 @@ export default class UIManager {
     showtip(strTip: string)
     {
         log('showtip='+strTip);
-//        //const newTipNode: cc.Node = (cc as any).duplicate(this.tipNode);
+
         let newTipNode = instantiate(this.tipNode);
         this.appRootNode.addChild(newTipNode);
         newTipNode.y = Math.random() * (500 - (-500)) + (-500);
-        newTipNode.zIndex = 1000;
+        newTipNode.setSiblingIndex(1000);
         let tippanel = newTipNode.addComponent("TipPanel");
-        tippanel.showTip(strTip);
-//        //let tipComp = this.tipNode.getComponent('TipNode');
-//        //tipComp.showTip(strTip);
+        (tippanel as any).showTip(strTip);
+
     }
   
 }
-
-
-/**
- * 注意：已把原脚本注释，由于脚本变动过大，转换的时候可能有遗落，需要自行手动转换
- */
-// import UIPanel from "./ui/UIPanel"
-// 
-// import {ESceneType} from "./CommonEnum";
-// import ResManager from "./ResManager";
-// //import LoginPanel from "./LoginPanel";
-// 
-// export default class UIManager {
-// 
-// 
-//     public static readonly Instance: UIManager = new UIManager();
-// 
-//     public static OpenPanel(nPanelId: number, strParam?: string) {
-//         UIManager.Instance.OpenPanel(nPanelId, strParam);
-//     }
-//     
-//     public static ShowTip(strTip: string)
-//     {
-//         cc.log('UIManager ShowTip='+strTip);
-//         UIManager.Instance.showtip(strTip);
-//     }
-// 
-//     private constructor(){
-//     }
-//     mapUIPanel: {[key: number]: UIPanel} = {};
-//     mapScendName: {[key: number]: string} = {};
-//     appRootNode: cc.Node;
-//     tipNode: cc.Node;
-// 
-//     onLoadEnd(err, res){
-//         // for(let key in res.json){
-//         //     let nKey = parseInt(key);
-//         //     cc.log(key)
-//         //     this.mapScendName[nKey] = res.json[key];
-//         // }
-//         // cc.log('loadresendforfend')
-//         // for(let key in this.mapScendName){
-//         //     cc.log('www'+key+ this.mapScendName[key])
-//         // }
-//     }
-// 
-//     Init(appRootNode: cc.Node){
-//         this.appRootNode = appRootNode;
-// 
-//         this.createTipNode();
-//     }
-// 
-//     loadPanel()
-//     {
-// 
-//     }
-//     GetPanel(nPanelId: number)
-//     {
-//         return this.mapUIPanel[nPanelId];
-//     }
-// 
-//     OpenPanel(nPanelId: number, strParam?: string)
-//     {
-//         let uiPanelTab = ResManager.Instance.mapUIPanelTab[nPanelId];
-// 
-//         if(uiPanelTab.nRemove === 1)
-//         {
-//             this.appRootNode.removeAllChildren(false);
-//         }
-//         let panel = this.mapUIPanel[nPanelId]
-//         if(panel != null)
-//         {
-//             if(panel.node.parent === null)
-//             {
-//                 this.appRootNode.addChild(panel.node);
-//             }
-//             panel.OnOpen( strParam);
-//             return;
-//         }
-// 
-//         function  onLoadPrefabEnd(err, prefab)
-//         {
-//             let prefabNode: cc.Node = cc.instantiate(prefab);
-//             prefabNode.addComponent(cc.BlockInputEvents);
-//             let panel = prefabNode.addComponent(uiPanelTab.strName);
-//             this.appRootNode.addChild(panel.node);
-//             panel.OnOpen( strParam);
-//             this.mapUIPanel[nPanelId] = panel;
-// 
-//             //cc.Prefab
-//             //cc.loader.releaseAsset(prefab)
-//             cc.assetManager.releaseAsset(prefab)
-//         }
-//         //cc.loader.loadRes( uiPanelTab.strPrefabName, onLoadPrefabEnd.bind(this));
-//         //static loadRes(url: string, completeCallback: (error: Error, resource: any) => void): void;
-//         cc.resources.load( uiPanelTab.strPrefabName, onLoadPrefabEnd.bind(this));
-// 
-//     }
-//     closePanel(nPanelId: number)
-//     {
-//         
-//         let panel = this.mapUIPanel[nPanelId]
-//         if(panel === null)
-//         {
-//             return;
-//         }
-//         panel.node.removeFromParent(false);
-//         panel.OnClose();
-//     }
-// 
-//     loadScene(nType:ESceneType)
-//     {
-//         let strName = this.mapScendName[nType]
-//         if(strName === null)
-//         {
-//             return;
-//         }
-//         cc.director.loadScene(strName,this.onLoadSceneEnd.bind(this));
-//     }
-//     onLoadSceneEnd(){
-// 
-// 
-//         
-// 
-//     }
-// 
-//     createTipNode()
-//     {
-//         if(this.tipNode != null)
-//         {
-//             return;
-//         }
-//         function  onLoadPrefabEnd(err, prefab)
-//         {
-//             this.tipNode = cc.instantiate(prefab);
-//             //this.tipNode.retain();
-// 
-//             //this.appRootNode.addChild(this.tipNode);
-//             //cc.Prefab
-//             //cc.loader.releaseAsset(prefab)
-//             cc.assetManager.releaseAsset(prefab)
-//         }
-//         //cc.loader.loadRes( "prefab/TipNode", onLoadPrefabEnd.bind(this));
-//         cc.resources.load( "prefab/tippanel", onLoadPrefabEnd.bind(this));
-//     }           
-// 
-//     showtip(strTip: string)
-//     {
-//         cc.log('showtip='+strTip);
-//         //const newTipNode: cc.Node = (cc as any).duplicate(this.tipNode);
-// 
-//         let newTipNode = cc.instantiate(this.tipNode);
-// 
-//         this.appRootNode.addChild(newTipNode);
-//         newTipNode.y = Math.random() * (500 - (-500)) + (-500);
-//         newTipNode.zIndex = 1000;
-//         let tippanel = newTipNode.addComponent("TipPanel");
-//         tippanel.showTip(strTip);
-// 
-//         //let tipComp = this.tipNode.getComponent('TipNode');
-//         //tipComp.showTip(strTip);
-// 
-//     }
-// 
-// 
-// 
-//   
-// }

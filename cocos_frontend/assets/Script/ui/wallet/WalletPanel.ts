@@ -1,6 +1,6 @@
 
 import * as cc from 'cc';
-import { _decorator, Label, Button, RichText, EditBox, Node, log } from 'cc';
+import { _decorator, Label, Button, RichText, EditBox, Node, log, UITransform } from 'cc';
 const {ccclass, property} = _decorator;
 
 import UIPanel from "../UIPanel"
@@ -22,7 +22,7 @@ class WalletData extends CellData{
         this.btnIcon = this.node.getChildByName('btnicon').getComponent(Button);
           this.labName = this.btnIcon.node.getChildByName('labelname').getComponent(Label);
         this.labCap = this.btnIcon.node.getChildByName('labelcap').getComponent(Label);
-        this.nOldBgHeight = this.node.height;
+        this.nOldBgHeight = this.node.getComponent(UITransform).height;
     }
     refreshUI(info:WalletCellData){
         this.labName.string = info.nId.toString();//sName
