@@ -76,15 +76,8 @@ export default class ETHWalletPanel extends UIPanel {
         this.labelbalance.string = 'Balance: error';
         });
      }
-//        // ETHManager.Instance.GetBalanceETH(ethAddress).then((balanceText) => {
-//        //         this.labelbalance.string = balanceText;
-//        //     })
-//        //     .catch((e) => {
-//        //         cc.error('ETHWalletPanel: GetBalance failed:', e);
-//        //         this.labelbalance.string = 'Balance: error';
-//        //     });
-     
-    
+
+
     OnClose()
     {
         

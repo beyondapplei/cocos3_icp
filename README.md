@@ -28,6 +28,43 @@
 
 5. 在 Cocos Creator 中运行调试。
 
+## 排障 / 踩坑记录（重要）
+
+### 1) `local-deploy-app.sh` 构建完成但脚本退出（exit code 36）
+
+现象：Cocos Creator 构建日志显示 Finished，但 `./local-deploy-app.sh` 仍然退出，导致后续 `dfx deploy` 没有执行。
+
+结论：Cocos Creator CLI 有时会用 **36** 表示“构建结束但存在告警/非致命问题”。
+
+处理：脚本已做兼容——遇到 `36` 继续执行；遇到其它非 0 才失败退出。
+
+### 2) 本地 replica API 版本差异（v2 vs v3/v4）
+
+现象：前端 SDK（例如 `@icp-sdk/core`）可能会请求 `/api/v3/*` 或 `/api/v4/*`，但某些本地环境只支持 `/api/v2/*`，导致 404/400。
+
+处理：在前端的 fetch 适配层做了路径重写（v3/v4 → v2），并在本地禁用 query 签名校验/拉取 root key（开发态）。
+
+### 3) 运行期 400：`user id` 与 `public key` 不匹配
+
+现象：访问本地 replica 时，`/api/v2/canister/.../query` 或 `/call` 返回 400，报错形如：
+
+`The user id '<principal>' does not match the public key '<...>'`
+
+原因（本项目实际根因）：Cocos/Rollup/转译环境下，TypedArray（如 `Uint8Array`）在某些 `concat/spread` 场景会被“当成单个元素”而不是展开，导致 **字节序列化被悄悄破坏**；最终表现为 sender/principal/pubkey 在 replica 校验时对不上。
+
+处理：
+- `Polyfill.ts`：对 TypedArray 相关的 `concat`/拼接行为做了兼容补丁，并修正 `Principal.toText` 的字节拼接逻辑。
+- `LoginManager.ts`：增加一次性清理旧 identity/delegation 缓存的逻辑，避免历史损坏数据继续触发 mismatch。
+
+验证：
+- 重新执行 `bash ./local-deploy-app.sh`
+- 用推荐地址访问（示例）：`http://<frontend-canister>.localhost:4943/`
+- 如仍异常，优先用无痕窗口或强制刷新，确保加载到最新前端产物。
+
+### 4) Node.js vs 浏览器/Cocos 运行时差异（Buffer/process/crypto）
+
+下面这些说明用于理解为什么需要 shim/polyfill（保留作为背景）：
+
 
 
 Node.js vs 浏览器：您使用的库（@icp-sdk、ethers、elliptic）是为 Node.js 环境设计的，它们依赖 Node.js 特有的全局变量（如 Buffer、process）和内置模块（如 crypto、http）。

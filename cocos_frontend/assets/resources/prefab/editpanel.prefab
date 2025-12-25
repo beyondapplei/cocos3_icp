@@ -1740,9 +1740,7 @@
     "_useOriginalSize": false,
     "_string": "",
     "_tabIndex": 0,
-    "_backgroundImage": {
-      "__uuid__": "ff0e91c7-55c6-4086-a39f-cb6e457b8c3b"
-    },
+    "_backgroundImage": null,
     "_inputFlag": 5,
     "_inputMode": 6,
     "_maxLength": 8,

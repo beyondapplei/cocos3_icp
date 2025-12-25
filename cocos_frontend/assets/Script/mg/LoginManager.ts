@@ -47,6 +47,15 @@ export default class LoginManager {
     Init() {
         // 预先初始化 AuthClient，否则可能 AuthClient not ready
         // 特别是在 Web Build 下更容易遇到此问题
+        
+        // Force clear storage once to fix potential identity mismatch issues from previous builds
+        // This can be removed later
+        if (!this.getBrowserLocalStorage()?.getItem('ic-identity-cleared-v1')) {
+            this.clearAuthClientStorage();
+            this.getBrowserLocalStorage()?.setItem('ic-identity-cleared-v1', 'true');
+            console.log("LoginManager: Cleared old identity storage.");
+        }
+
         void this.ensureAuthClient().catch(() => {
             // UI 层自行提示；这里不抛出
         });

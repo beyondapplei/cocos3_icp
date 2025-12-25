@@ -4,15 +4,14 @@ import * as cc from 'cc';
 import '../shims/runtime';
 import { _decorator } from 'cc';
 import LoginManager from "./LoginManager";
-import { ethers } from '../shims/ethers';
+import { computeEthAddressFromPublicKey, isHexString, hexToBytes } from '../shims/eth-utils';
 import { idlFactoryBack } from "./backend.did";
 
 import { AuthClient } from '@icp-sdk/auth/client';
 import { Principal } from '@icp-sdk/core/principal';
 import { Actor, HttpAgent } from '@icp-sdk/core/agent';
 
-import { DFX_NETWORK } from "./DefData";
-import AppManager from "./AppkManager";
+import { BACKEND_CANISTER_ID_LOCAL_FALLBACK, DFX_NETWORK } from "./DefData";
 
 export default class BackManager {
     public static readonly Instance: BackManager = new BackManager();
@@ -29,7 +28,7 @@ export default class BackManager {
         // : (typeof self !== 'undefined' ? self : {})));
     }
     private getBackendCanisterId(): string {
-         return AppManager.Instance.GetBackendCanisterId();
+           return BACKEND_CANISTER_ID_LOCAL_FALLBACK;
     }
     private getAgentHost(): string | undefined {
        
@@ -105,7 +104,7 @@ export default class BackManager {
         const pkBytes = new Uint8Array(publicKey);
         cc.log("BackManager: GetEthAddress publicKey bytes:", pkBytes);
 
-        return ethers.utils.computeAddress(ethers.utils.hexlify(pkBytes));
+        return computeEthAddressFromPublicKey(pkBytes);
     }
     async Sign(data: Uint8Array | number[] | string): Promise<Uint8Array> {
         cc.log("BackManager: Sign called");
@@ -115,7 +114,7 @@ export default class BackManager {
         let bytes: Uint8Array;
          if (typeof data === 'string') {
          try {
-         bytes = ethers.utils.arrayify(data);
+         bytes = isHexString(data) ? hexToBytes(data) : new TextEncoder().encode(data);
          } catch (e) {
              // 如果不是 hex 字符串，按 UTF-8 编码
          bytes = new TextEncoder().encode(data);

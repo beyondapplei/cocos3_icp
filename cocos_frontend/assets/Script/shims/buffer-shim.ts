@@ -20,8 +20,9 @@ class BufferShim extends Uint8Array {
       super(arg);
   }
 
-  static from(input: any, encoding?: string) {
+  static from(input: any, encodingOrOffset?: string | number, length?: number) {
     if (typeof input === 'string') {
+      const encoding = typeof encodingOrOffset === 'string' ? encodingOrOffset : 'utf8';
       if (!encoding || encoding === 'utf8' || encoding === 'utf-8') {
         return new BufferShim(new TextEncoder().encode(input));
       }
@@ -38,7 +39,11 @@ class BufferShim extends Uint8Array {
         return new BufferShim(arr);
       }
     }
-    if (input instanceof ArrayBuffer) return new BufferShim(new Uint8Array(input));
+    if (input instanceof ArrayBuffer) {
+        const offset = typeof encodingOrOffset === 'number' ? encodingOrOffset : 0;
+        const len = length !== undefined ? length : (input.byteLength - offset);
+        return new BufferShim(new Uint8Array(input, offset, len));
+    }
     if (Array.isArray(input) || input instanceof Uint8Array) return new BufferShim(input as any);
     throw new Error('BufferShim.from: unsupported input');
   }
