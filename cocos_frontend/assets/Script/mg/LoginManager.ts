@@ -1,5 +1,10 @@
 import { DFX_NETWORK, II_CANISTER_ID_LOCAL } from "./DefData";
 
+const globalAuth = (window as any).DfinityAuthClient;
+console.log("LoginManager: globalAuth is", globalAuth);
+const AuthClient = globalAuth ? globalAuth.AuthClient : null;
+const LocalStorage = globalAuth ? globalAuth.LocalStorage : null;
+
 export default class LoginManager {
     public static readonly Instance: LoginManager = new LoginManager();
     private constructor() {}
@@ -62,10 +67,6 @@ export default class LoginManager {
 
     public async ensureAuthClient(): Promise<any> {
         if (this.authClient) return this.authClient;
-
-        const authMod = (globalThis as any)?.DfinityAuthClient;
-		const AuthClient = authMod?.AuthClient;
-		const LocalStorage = authMod?.LocalStorage;
 
         if (!AuthClient) {
             console.error("LoginManager: AuthClient missing. Ensure lib3/icp-sdk-auth-client.js is loaded before application.js");

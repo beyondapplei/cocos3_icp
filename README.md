@@ -90,9 +90,16 @@ bash ./lib_to_lib3.sh
 ```
 
 输出：
-- `cocos_frontend/build/web-mobile/icp-sdk.umd.js`
-- 同时会拷贝一份到 `cocos_frontend/assets/Script/lib3/icp-sdk.umd.js`
 
-使用方式：页面加载后可以通过 `globalThis.IcpSdk` 访问。
+
+如果你重启后仍然报同样的 elliptic.js -> ../package.json，那说明还有别的依赖在运行时拉了 elliptic（常见来源是 crypto-browserify -> browserify-sign）。到时候我建议直接做下一步：在 node_modules 里把 elliptic.version = require('../package.json').version; 改成常量/空值（我可以帮你补丁掉，避免再触发 JSON specifier）。
+
+已按你要求“不改第三方库”处理：把触发 node:http 的根因（代码里直接 import 'ethers'）移除了，改用你项目里已经有的工具函数来格式化 ETH。
+* 修复点在 ETHManager.ts
+    * 删除 import { ethers } from 'ethers'
+    * 用 formatEtherFromWei(wei, 6)（来自 eth-utils.ts）替代 ethers.formatEther
+* 已清理 temp/programming，确保 Creator 预览重新打包后不会再生成 node:http/node:https 的报错桩模块。
+
+
 
 

@@ -2,7 +2,7 @@
 
 import * as cc from 'cc';
 
-import '../runtime';
+import './Polyfill';
 import { _decorator } from 'cc';
 import UIManager from "../mg/UIManager";
 import LoginManager from "./LoginManager";

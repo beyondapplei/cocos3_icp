@@ -1,7 +1,7 @@
 
 import * as cc from 'cc';
 
-import '../runtime';
+import './Polyfill';
 import { _decorator } from 'cc';
 import LoginManager from "./LoginManager";
 import { computeEthAddressFromPublicKey, isHexString, hexToBytes } from '../eth-utils';

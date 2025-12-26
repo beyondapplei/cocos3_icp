@@ -1,5 +1,5 @@
 import { _decorator } from 'cc';
-import '../runtime';
+import './Polyfill';
 import UIManager from "../mg/UIManager";
 import LoginManager from "./LoginManager";
 import { DFX_NETWORK } from "./DefData";
@@ -18,10 +18,10 @@ export default class ETHManager {
    
     async GetBalanceETH(ethAddress: string): Promise<string> {
         try {
-				const balHex = await jsonRpc<string>(this.rpcUrl, 'eth_getBalance', [ethAddress, 'latest']);
-				const wei = BigInt(balHex);
-				const balanceInEth = formatEtherFromWei(wei, 6);
-				return `Balance: ${balanceInEth} ETH`;
+                                const balHex = await jsonRpc<string>(this.rpcUrl, 'eth_getBalance', [ethAddress, 'latest']);
+								const wei = BigInt(balHex);
+								const balanceInEth = formatEtherFromWei(wei, 6);
+								return `Balance: ${balanceInEth} ETH`;
         } catch (e: any) {
                 console.error(e);
                 return 'Balance: error';
