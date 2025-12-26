@@ -11,8 +11,6 @@
     }
   },
   "dependencies": {
-    "@dfinity/agent": "^3.4.3",
-    "@dfinity/auth-client": "^3.4.3",
     "@icp-sdk/auth": "^5.0.0",
     "@icp-sdk/core": "^5.0.0",
     "assert": "^2.1.0",
@@ -24,7 +22,11 @@
     "stream-browserify": "^3.0.0",
     "util": "^0.12.5"
   },
+  "devDependencies": {
+    "esbuild": "^0.25.0"
+  },
   "scripts": {
-    "debug": "npx http-server build/web-mobile -p 8080 -c-1"
+    "debug": "npx http-server build/web-mobile -p 8080 -c-1",
+    "sync:lib3": "node ./tools/sync-lib3.mjs"
   }
 }

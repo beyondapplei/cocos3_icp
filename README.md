@@ -78,3 +78,21 @@ ethers：用 UMD 产物，避免 ESM/CJS 冲突；并且兼容“UMD 在 Cocos �
 ICP：业务侧不改三方库，通过两层“适配”让本地强制走 v2：
 update call：callSync: false（走 /api/v2/.../call）
 query/read_state：把 /api/v3/*（以及兜底 /api/v4/*）重写为 /api/v2/*
+
+## 可选：把 `@icp-sdk` 打成单文件（UMD 风格）
+
+背景：`@icp-sdk/auth` / `@icp-sdk/core` 当前发布的是 ESM 为主的包结构，没有官方 UMD。为了在 Cocos/Web 环境里更可控地加载，可以用 esbuild 把它们打成一个 IIFE（UMD 风格）单文件，并暴露 `globalThis.IcpSdk`。
+
+生成 bundle：
+
+```bash
+bash ./lib_to_lib3.sh
+```
+
+输出：
+- `cocos_frontend/build/web-mobile/icp-sdk.umd.js`
+- 同时会拷贝一份到 `cocos_frontend/assets/Script/lib3/icp-sdk.umd.js`
+
+使用方式：页面加载后可以通过 `globalThis.IcpSdk` 访问。
+
+

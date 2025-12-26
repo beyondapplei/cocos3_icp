@@ -1,17 +1,20 @@
 
 import * as cc from 'cc';
 
-import '../shims/runtime';
+import '../runtime';
 import { _decorator } from 'cc';
 import LoginManager from "./LoginManager";
-import { computeEthAddressFromPublicKey, isHexString, hexToBytes } from '../shims/eth-utils';
+import { computeEthAddressFromPublicKey, isHexString, hexToBytes } from '../eth-utils';
 import { idlFactoryBack } from "./backend.did";
 
-import { AuthClient } from '@icp-sdk/auth/client';
-import { Principal } from '@icp-sdk/core/principal';
-import { Actor, HttpAgent } from '@icp-sdk/core/agent';
-
 import { BACKEND_CANISTER_ID_LOCAL_FALLBACK, DFX_NETWORK } from "./DefData";
+import { createIcpAgent } from './IcpAgentFactory';
+
+function getIcpSdkAgent(): any {
+    const mod = (globalThis as any)?.DfinityAgent;
+    if (!mod) throw new Error('DfinityAgent not loaded. Ensure lib3/icp-sdk-agent.js is loaded before application.js');
+    return mod;
+}
 
 export default class BackManager {
     public static readonly Instance: BackManager = new BackManager();
@@ -51,45 +54,16 @@ export default class BackManager {
 
         const host = this.getAgentHost();
         cc.log("BackManager: creating agent with host:", host);
-        const baseFetch = window.fetch.bind(window);
-        const fetchCompat: any = DFX_NETWORK === 'local'
-            ? (input: any, init?: any) => {
-                try {
-                    const url = new URL(
-                        typeof input === 'string' ? input : (input && input.url) ? input.url : String(input),
-                        host,
-                    );
-                    if (url.pathname.startsWith('/api/v3/')) {
-                        url.pathname = url.pathname.replace('/api/v3/', '/api/v2/');
-                    } else if (url.pathname.startsWith('/api/v4/')) {
-                        url.pathname = url.pathname.replace('/api/v4/', '/api/v2/');
-                    }
-                    const nextInput = (typeof input === 'string') ? url.toString() : new Request(url.toString(), input);
-                    return baseFetch(nextInput as any, init);
-                } catch (e) {
-                    return baseFetch(input as any, init);
-                }
-            }
-            : baseFetch;
+		const agent = await createIcpAgent({
+			identity,
+			host,
+			isLocal: DFX_NETWORK === 'local',
+			verifyQuerySignatures: false,
+			fetchRootKey: true,
+		});
 
-        const agent = await HttpAgent.create({ identity, host, verifyQuerySignatures: false, fetch: fetchCompat });
-
-        if (DFX_NETWORK === 'local') {
-            // Force V2 call interface for local replica compatibility.
-            // @icp-sdk/core defaults to v4 sync calls for updates (callSync=true), which can fail on some local replicas.
-            // We avoid modifying any third-party libs by wrapping the instance method here.
-            const originalCall = (agent as any).call?.bind(agent);
-            if (originalCall) {
-                (agent as any).call = (canisterId: any, options: any, identityOverride?: any) => {
-                    return originalCall(canisterId, { ...(options || {}), callSync: false }, identityOverride);
-                };
-            }
-        }
-        if (DFX_NETWORK === 'local' && agent && agent.fetchRootKey) {
-        cc.log("BackManager: fetching root key...");
-        await agent.fetchRootKey();
-        cc.log("BackManager: root key fetched.");
-        }
+        const Actor = getIcpSdkAgent()?.Actor;
+        if (!Actor) throw new Error('DfinityAgent.Actor missing');
 
         this.backendActor = Actor.createActor(idlFactoryBack, { agent, canisterId });
         return this.backendActor;

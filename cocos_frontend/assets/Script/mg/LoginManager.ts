@@ -1,7 +1,3 @@
-
-import "./Polyfill";
-
-import { AuthClient } from '@icp-sdk/auth/client';
 import { DFX_NETWORK, II_CANISTER_ID_LOCAL } from "./DefData";
 
 export default class LoginManager {
@@ -50,9 +46,10 @@ export default class LoginManager {
         
         // Force clear storage once to fix potential identity mismatch issues from previous builds
         // This can be removed later
-        if (!this.getBrowserLocalStorage()?.getItem('ic-identity-cleared-v1')) {
+        // Bump marker when auth storage/key strategy changes.
+        if (!this.getBrowserLocalStorage()?.getItem('ic-identity-cleared-v3')) {
             this.clearAuthClientStorage();
-            this.getBrowserLocalStorage()?.setItem('ic-identity-cleared-v1', 'true');
+            this.getBrowserLocalStorage()?.setItem('ic-identity-cleared-v3', 'true');
             console.log("LoginManager: Cleared old identity storage.");
         }
 
@@ -66,14 +63,30 @@ export default class LoginManager {
     public async ensureAuthClient(): Promise<any> {
         if (this.authClient) return this.authClient;
 
+        const authMod = (globalThis as any)?.DfinityAuthClient;
+		const AuthClient = authMod?.AuthClient;
+		const LocalStorage = authMod?.LocalStorage;
+
         if (!AuthClient) {
-            console.error("LoginManager: AuthClient class is missing! Check dfinity-auth-client.js");
+            console.error("LoginManager: AuthClient missing. Ensure lib3/icp-sdk-auth-client.js is loaded before application.js");
             return null;
         }
 
         // Cocos 环境下 IndexedDB 可能不可用/数据损坏；强制使用 LocalStorage 更稳。
+        const createClient = async () => {
+            if (LocalStorage) {
+                return await AuthClient.create({
+                    storage: new LocalStorage('ic-', this.getBrowserLocalStorage() || undefined),
+                    // With LocalStorage, prefer Ed25519 because it can be persisted as a string.
+                    // Default ECDSA uses CryptoKeyPair, which is not a safe fit for localStorage.
+                    keyType: 'Ed25519',
+                });
+            }
+            return await AuthClient.create();
+        };
+
         try {
-            const client = await AuthClient.create();
+            const client = await createClient();
             if (!client) throw new Error('AuthClient creation failed');
             this.authClient = client;
             return this.authClient;
@@ -85,7 +98,7 @@ export default class LoginManager {
                 msg.indexOf('DelegationChain') >= 0 || 
                 msg.indexOf('valid checksum') >= 0) {
                 this.clearAuthClientStorage();
-                const client = await AuthClient.create();
+                const client = await createClient();
                 if (!client) throw new Error('AuthClient creation failed');
                 this.authClient = client;
                 return this.authClient;

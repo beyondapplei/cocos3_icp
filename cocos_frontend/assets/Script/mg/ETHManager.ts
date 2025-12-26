@@ -1,9 +1,9 @@
 import { _decorator } from 'cc';
-import '../shims/runtime';
+import '../runtime';
 import UIManager from "../mg/UIManager";
 import LoginManager from "./LoginManager";
 import { DFX_NETWORK } from "./DefData";
-import { formatEtherFromWei, jsonRpc } from '../shims/eth-utils';
+import { formatEtherFromWei, jsonRpc } from '../eth-utils';
 import BackManager from "./BackManager";
 
 export default class ETHManager {

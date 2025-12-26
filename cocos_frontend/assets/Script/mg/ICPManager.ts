@@ -2,19 +2,23 @@
 
 import * as cc from 'cc';
 
-import '../shims/runtime';
+import '../runtime';
 import { _decorator } from 'cc';
 import UIManager from "../mg/UIManager";
 import LoginManager from "./LoginManager";
 import { DFX_NETWORK, LEAGER_ICP_ID_LOCAL } from "./DefData";
 
-import { AuthClient } from '@icp-sdk/auth/client';
-import { Principal } from '@icp-sdk/core/principal';
-import { Actor, HttpAgent } from '@icp-sdk/core/agent';
+import { createIcpAgent } from './IcpAgentFactory';
 
 
 
 import { idlFactoryLedger } from "./icp_ledger.did";
+
+function getIcpSdkAgent(): any {
+    const mod = (globalThis as any)?.DfinityAgent;
+    if (!mod) throw new Error('DfinityAgent not loaded. Ensure lib3/icp-sdk-agent.js is loaded before application.js');
+    return mod;
+}
 
 export default class ICPManager {
     public static readonly Instance: ICPManager = new ICPManager();
@@ -58,42 +62,17 @@ export default class ICPManager {
        // Cocos 运行环境下，query 签名验证会触发 fetchSubnetKeys -> canisterStatus.request，
        // 某些环境会在 encodePath 阶段出现 "[object Set]" 的路径编码异常。
        // 为保证查询/转账流程可用，这里先关闭 query 签名验证。
-        const baseFetch = window.fetch.bind(window);
-        const fetchCompat: any = DFX_NETWORK === 'local'
-            ? (input: any, init?: any) => {
-                try {
-                    const url = new URL(
-                        typeof input === 'string' ? input : (input && input.url) ? input.url : String(input),
-                        host,
-                    );
-                    if (url.pathname.startsWith('/api/v3/')) {
-                        url.pathname = url.pathname.replace('/api/v3/', '/api/v2/');
-                    } else if (url.pathname.startsWith('/api/v4/')) {
-                        url.pathname = url.pathname.replace('/api/v4/', '/api/v2/');
-                    }
-                    const nextInput = (typeof input === 'string') ? url.toString() : new Request(url.toString(), input);
-                    return baseFetch(nextInput as any, init);
-                } catch (e) {
-                    return baseFetch(input as any, init);
-                }
-            }
-            : baseFetch;
-
-        const agent = await HttpAgent.create({ identity, host, verifyQuerySignatures: false, fetch: fetchCompat });
-
-        if (DFX_NETWORK === 'local') {
-            // Force V2 call interface for local replica compatibility (disable v4 sync calls).
-            const originalCall = (agent as any).call?.bind(agent);
-            if (originalCall) {
-                (agent as any).call = (canisterId: any, options: any, identityOverride?: any) => {
-                    return originalCall(canisterId, { ...(options || {}), callSync: false }, identityOverride);
-                };
-            }
-        }
-        if (DFX_NETWORK === 'local' && agent && agent.fetchRootKey) {
-        await agent.fetchRootKey();
-        }
+		const agent = await createIcpAgent({
+			identity,
+			host,
+			isLocal: DFX_NETWORK === 'local',
+			verifyQuerySignatures: false,
+			fetchRootKey: true,
+		});
        //如果不是本地环境，不用调用 fetchRootKey
+
+        const Actor = getIcpSdkAgent()?.Actor;
+        if (!Actor) throw new Error('DfinityAgent.Actor missing');
 
         this.ledgerActor = Actor.createActor(idlFactoryLedger, { agent, canisterId });
         this.ledgerCanisterId = canisterId;
@@ -129,6 +108,8 @@ export default class ICPManager {
 
         cc.log("GetBalance principalText=",principalText);
 
+        const Principal = getIcpSdkAgent()?.Principal;
+        if (!Principal) throw new Error('DfinityAgent.Principal missing');
         const owner =  Principal.fromText(pText);
         const balanceE8sAny: any = await actor.icrc1_balance_of({ owner, subaccount: [] });
         const balanceE8sNum = Number(balanceE8sAny && balanceE8sAny.toString ? balanceE8sAny.toString() : balanceE8sAny);
@@ -143,6 +124,8 @@ export default class ICPManager {
 
         const actor = await this.ensureLedgerActor(strLedgerCanisterId);
         cc.log("SendICP toText=",toText);
+        const Principal = getIcpSdkAgent()?.Principal;
+        if (!Principal) throw new Error('DfinityAgent.Principal missing');
         const toOwner = Principal.fromText(toText);
         cc.log("SendICP toOwner=", toOwner);
         const amountE8s = this.parseIcpToE8s(amountText);
