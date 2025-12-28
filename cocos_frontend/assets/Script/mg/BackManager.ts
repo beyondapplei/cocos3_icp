@@ -4,11 +4,11 @@ import * as cc from 'cc';
 import './Polyfill';
 import { _decorator } from 'cc';
 import LoginManager from "./LoginManager";
-import { computeEthAddressFromPublicKey, isHexString, hexToBytes } from '../eth-utils';
 import { idlFactoryBack } from "./backend.did";
 
 import { BACKEND_CANISTER_ID_LOCAL_FALLBACK, DFX_NETWORK } from "./DefData";
 import { createIcpAgent } from './IcpAgentFactory';
+import { ethers } from '../lib3/ethers.umd.min.js';
 
 function getIcpSdkAgent(): any {
     const mod = (globalThis as any)?.DfinityAgent;
@@ -78,7 +78,8 @@ export default class BackManager {
         const pkBytes = new Uint8Array(publicKey);
         cc.log("BackManager: GetEthAddress publicKey bytes:", pkBytes);
 
-        return computeEthAddressFromPublicKey(pkBytes);
+        // ethers v6 API: computeAddress/hexlify are top-level exports.
+        return ethers.computeAddress(ethers.hexlify(pkBytes));
     }
     async Sign(data: Uint8Array | number[] | string): Promise<Uint8Array> {
         cc.log("BackManager: Sign called");
@@ -88,10 +89,11 @@ export default class BackManager {
         let bytes: Uint8Array;
          if (typeof data === 'string') {
          try {
-         bytes = isHexString(data) ? hexToBytes(data) : new TextEncoder().encode(data);
+		 // ethers v6 API: isHexString/getBytes/toUtf8Bytes are top-level exports.
+		 bytes = ethers.isHexString(data) ? ethers.getBytes(data) : ethers.toUtf8Bytes(data);
          } catch (e) {
              // 如果不是 hex 字符串，按 UTF-8 编码
-         bytes = new TextEncoder().encode(data);
+		 bytes = ethers.toUtf8Bytes(data);
          }
         } else if (data instanceof Uint8Array) {
         bytes = data;

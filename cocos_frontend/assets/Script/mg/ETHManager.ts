@@ -3,7 +3,7 @@ import './Polyfill';
 import UIManager from "../mg/UIManager";
 import LoginManager from "./LoginManager";
 import { DFX_NETWORK } from "./DefData";
-import { formatEtherFromWei, jsonRpc } from '../eth-utils';
+import { ethers } from '../lib3/ethers.umd.min.js';
 import BackManager from "./BackManager";
 
 export default class ETHManager {
@@ -17,14 +17,19 @@ export default class ETHManager {
    
    
     async GetBalanceETH(ethAddress: string): Promise<string> {
-        try {
-                                const balHex = await jsonRpc<string>(this.rpcUrl, 'eth_getBalance', [ethAddress, 'latest']);
-								const wei = BigInt(balHex);
-								const balanceInEth = formatEtherFromWei(wei, 6);
-								return `Balance: ${balanceInEth} ETH`;
-        } catch (e: any) {
-                console.error(e);
-                return 'Balance: error';
+          try {
+
+                const provider = new ethers.JsonRpcProvider('https://ethereum-sepolia-rpc.publicnode.com');
+
+                //let provider = new ethers.providers.JsonRpcProvider('https://ethereum-sepolia-rpc.publicnode.com');
+            
+            const bal = await provider.getBalance(ethAddress);
+            //const balanceInEth = parseFloat(ethers.utils.formatEther(bal)); // 转换为 ETH
+            const balanceInEth = parseFloat(ethers.formatEther(bal));
+            return `Balance: ${balanceInEth.toFixed(6)} ETH`;
+        } catch (e) {
+            console.error(e);
+            return 'Balance: error';
         }
     }
     async SendETH(fromAddr: string,toAddr: string, amountStr: string): Promise<string> {
