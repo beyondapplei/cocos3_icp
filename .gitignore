@@ -15,5 +15,3 @@ node_modules/
 # WebStorm
 .idea/
 .env
-/cocos_frontend/extensions/
-*.meta

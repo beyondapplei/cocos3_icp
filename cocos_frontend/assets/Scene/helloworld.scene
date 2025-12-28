@@ -113,8 +113,8 @@
     "_prefab": null,
     "_lpos": {
       "__type__": "cc.Vec3",
-      "x": 640,
-      "y": 360,
+      "x": 603,
+      "y": 1311,
       "z": 0
     },
     "_lrot": {
@@ -717,7 +717,7 @@
     "_priority": 0,
     "_fov": 60,
     "_fovAxis": 0,
-    "_orthoHeight": 476.8482039397451,
+    "_orthoHeight": 1311,
     "_near": 1,
     "_far": 4096,
     "_color": {
@@ -864,7 +864,7 @@
     "_string": "app scene ui. 2222",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 53.9375,
+    "_actualFontSize": 40,
     "_fontSize": 40,
     "_fontFamily": "Arial",
     "_lineHeight": 40,
@@ -1103,7 +1103,7 @@
     "_string": "GO",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 53.9375,
+    "_actualFontSize": 40,
     "_fontSize": 40,
     "_fontFamily": "Arial",
     "_lineHeight": 40,
@@ -1424,8 +1424,8 @@
     "__prefab": null,
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 1280,
-      "height": 720
+      "width": 1206,
+      "height": 2622
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -1521,8 +1521,8 @@
     "__prefab": null,
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 1280,
-      "height": 720
+      "width": 1206,
+      "height": 2622
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",

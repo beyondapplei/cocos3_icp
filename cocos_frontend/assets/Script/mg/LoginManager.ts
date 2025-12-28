@@ -124,7 +124,9 @@ export default class LoginManager {
         if (!this.authClient) return null;
         try {
             const identity = this.authClient.getIdentity();
-            return identity.getPrincipal().toText();
+            // Use the identity's principal directly to avoid mixing Principal implementations
+            // between bundled (UMD) SDK and npm modules in build output.
+            return identity?.getPrincipal?.()?.toText?.() ?? null;
         } catch {
             return null;
         }

@@ -11,13 +11,18 @@ import { DFX_NETWORK, LEAGER_ICP_ID_LOCAL } from "./DefData";
 import { createIcpAgent } from './IcpAgentFactory';
 
 
-
 import { idlFactoryLedger } from "./icp_ledger.did";
 
 function getIcpSdkAgent(): any {
     const mod = (globalThis as any)?.DfinityAgent;
     if (!mod) throw new Error('DfinityAgent not loaded. Ensure lib3/icp-sdk-agent.js is loaded before application.js');
     return mod;
+}
+
+function getIcpPrincipal(): any {
+    const Principal = getIcpSdkAgent()?.Principal;
+    if (!Principal) throw new Error('DfinityAgent.Principal missing');
+    return Principal;
 }
 
 export default class ICPManager {
@@ -74,7 +79,8 @@ export default class ICPManager {
         const Actor = getIcpSdkAgent()?.Actor;
         if (!Actor) throw new Error('DfinityAgent.Actor missing');
 
-        this.ledgerActor = Actor.createActor(idlFactoryLedger, { agent, canisterId });
+        const canisterPrincipal = getIcpPrincipal().fromText(canisterId);
+        this.ledgerActor = Actor.createActor(idlFactoryLedger, { agent, canisterId: canisterPrincipal });
         this.ledgerCanisterId = canisterId;
         return this.ledgerActor;
     }
@@ -108,9 +114,7 @@ export default class ICPManager {
 
         cc.log("GetBalance principalText=",principalText);
 
-        const Principal = getIcpSdkAgent()?.Principal;
-        if (!Principal) throw new Error('DfinityAgent.Principal missing');
-        const owner =  Principal.fromText(pText);
+        const owner = getIcpPrincipal().fromText(pText);
         const balanceE8sAny: any = await actor.icrc1_balance_of({ owner, subaccount: [] });
         const balanceE8sNum = Number(balanceE8sAny && balanceE8sAny.toString ? balanceE8sAny.toString() : balanceE8sAny);
         const balance = balanceE8sNum / 1e8;
@@ -124,9 +128,7 @@ export default class ICPManager {
 
         const actor = await this.ensureLedgerActor(strLedgerCanisterId);
         cc.log("SendICP toText=",toText);
-        const Principal = getIcpSdkAgent()?.Principal;
-        if (!Principal) throw new Error('DfinityAgent.Principal missing');
-        const toOwner = Principal.fromText(toText);
+		const toOwner = getIcpPrincipal().fromText(toText);
         cc.log("SendICP toOwner=", toOwner);
         const amountE8s = this.parseIcpToE8s(amountText);
 

@@ -7,6 +7,47 @@ if (typeof g.global === 'undefined') g.global = g;
 if (typeof g.window === 'undefined') g.window = g;
 if (typeof g.self === 'undefined') g.self = g;
 
+// In some JS engines/bundled runtimes, `[].concat(Uint8Array)` does NOT flatten bytes
+// (per spec it treats TypedArray as a single element). Some third-party SDKs
+// historically relied on flattening behavior for byte concatenation, which can
+// lead to corrupted Principal checksum logic in build output.
+// Patch concat to expand ArrayBufferViews into number arrays.
+if (!g.__concatTypedArrayPolyfillApplied) {
+	g.__concatTypedArrayPolyfillApplied = true;
+	const origConcat = Array.prototype.concat;
+	Array.prototype.concat = function (...args: any[]) {
+		if (!args || args.length === 0) return origConcat.apply(this, args as any);
+
+		let needPatch = false;
+		for (let i = 0; i < args.length; i++) {
+			const a = args[i];
+			if (!a) continue;
+			if (typeof ArrayBuffer !== 'undefined' && typeof ArrayBuffer.isView === 'function' && ArrayBuffer.isView(a)) {
+				needPatch = true;
+				break;
+			}
+		}
+		if (!needPatch) return origConcat.apply(this, args as any);
+
+		const expanded: any[] = new Array(args.length);
+		for (let i = 0; i < args.length; i++) {
+			const a = args[i];
+			if (a && typeof ArrayBuffer !== 'undefined' && typeof ArrayBuffer.isView === 'function' && ArrayBuffer.isView(a)) {
+				// DataView doesn't have numeric iteration in some runtimes; normalize to Uint8Array.
+				if (typeof DataView !== 'undefined' && a instanceof DataView) {
+					expanded[i] = Array.from(new Uint8Array(a.buffer, a.byteOffset, a.byteLength));
+				} else {
+					// TypedArray (Uint8Array/Int8Array/...) is iterable -> Array.from yields numbers.
+					expanded[i] = Array.from(a as any);
+				}
+			} else {
+				expanded[i] = a;
+			}
+		}
+		return origConcat.apply(this, expanded as any);
+	} as any;
+}
+
 // Provide a (best-effort) crypto.getRandomValues for libs like ethers.
 if (!g.crypto) g.crypto = {};
 if (typeof g.crypto.getRandomValues !== 'function') {

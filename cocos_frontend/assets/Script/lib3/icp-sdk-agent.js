@@ -2212,7 +2212,8 @@ Call context:
       throw new Error("Byte length must be a positive integer");
     }
     let val = readUIntLE(pipe, byteLength);
-    const mul = BigInt(2) ** (BigInt(8) * BigInt(byteLength - 1) + BigInt(7));
+    const shift = BigInt(8) * BigInt(byteLength - 1) + BigInt(7);
+    const mul = BigInt(1) << shift;
     if (val >= mul) {
       val -= mul * BigInt(2);
     }
@@ -6627,9 +6628,20 @@ variant ${k2} -> ${e.message}`);
   var _1n6 = BigInt(1);
   var _2n4 = BigInt(2);
   var _3n4 = BigInt(3);
+  var bigintPow = (base, exponent) => {
+    let result = _1n6;
+    let b = base;
+    let e = exponent;
+    while (e > _0n6) {
+      if ((e & _1n6) === _1n6) result *= b;
+      b *= b;
+      e >>= _1n6;
+    }
+    return result;
+  };
   function calcFrobeniusCoefficients(Fp4, nonResidue, modulus, degree, num = 1, divisor) {
     const _divisor = BigInt(divisor === void 0 ? degree : divisor);
-    const towerModulus = modulus ** BigInt(degree);
+    const towerModulus = bigintPow(modulus, BigInt(degree));
     const res = [];
     for (let i = 0; i < num; i++) {
       const a2 = BigInt(i + 1);
@@ -6651,8 +6663,9 @@ variant ${k2} -> ${e.message}`);
       const y22 = Fp22.mul(Fp22.frobeniusMap(y2, 1), PSI_Y);
       return [x22, y22];
     }
-    const PSI2_X = Fp22.pow(base, (Fp4.ORDER ** _2n4 - _1n6) / _3n4);
-    const PSI2_Y = Fp22.pow(base, (Fp4.ORDER ** _2n4 - _1n6) / _2n4);
+    const psi2Base = bigintPow(Fp4.ORDER, _2n4);
+    const PSI2_X = Fp22.pow(base, (psi2Base - _1n6) / _3n4);
+    const PSI2_Y = Fp22.pow(base, (psi2Base - _1n6) / _2n4);
     if (!Fp22.eql(PSI2_Y, Fp22.neg(Fp22.ONE)))
       throw new Error("psiFrobenius: PSI2_Y!==-1");
     function psi2(x2, y2) {
@@ -8390,7 +8403,13 @@ variant ${k2} -> ${e.message}`);
   }
 
   // node_modules/@icp-sdk/core/lib/esm/agent/utils/readState.js
-  var IC_ROOT_SUBNET_ID = Principal.fromText("tdb26-jop6k-aogll-7ltgs-eruif-6kk7m-qpktf-gdiqx-mxtrf-vb5e6-eqe");
+  // Precomputed bytes for: tdb26-jop6k-aogll-7ltgs-eruif-6kk7m-qpktf-gdiqx-mxtrf-vb5e6-eqe
+  // Using fromUint8Array avoids a fromText()/base32 decode + checksum step at module init,
+  // which can fail in some bundled runtimes.
+  var IC_ROOT_SUBNET_ID = Principal.fromUint8Array(new Uint8Array([
+    207, 242, 128, 227, 45, 127, 92, 205, 34, 70, 136, 47, 148, 175, 178, 15,
+    84, 202, 97, 162, 23, 101, 231, 18, 212, 61, 39, 137, 2
+  ]));
   function decodeValue(data, strategy) {
     switch (strategy) {
       case "raw":
