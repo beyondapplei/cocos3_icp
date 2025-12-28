@@ -3,7 +3,7 @@ import './Polyfill';
 import UIManager from "../mg/UIManager";
 import LoginManager from "./LoginManager";
 import { DFX_NETWORK } from "./DefData";
-import { ethers } from '../lib3/ethers.umd.min.js';
+// import { ethers } from '../lib3/ethers.umd.min.js'; // Removed: using global ethers from plugin script
 import BackManager from "./BackManager";
 
 export default class ETHManager {
