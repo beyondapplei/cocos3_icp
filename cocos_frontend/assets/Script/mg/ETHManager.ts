@@ -3,7 +3,6 @@ import './Polyfill';
 import UIManager from "../mg/UIManager";
 import LoginManager from "./LoginManager";
 import { DFX_NETWORK } from "./DefData";
-// import { ethers } from '../lib3/ethers.umd.min.js'; // Removed: using global ethers from plugin script
 import BackManager from "./BackManager";
 
 export default class ETHManager {
@@ -19,10 +18,7 @@ export default class ETHManager {
     async GetBalanceETH(ethAddress: string): Promise<string> {
           try {
 
-                const provider = new ethers.JsonRpcProvider('https://ethereum-sepolia-rpc.publicnode.com');
-
-                //let provider = new ethers.providers.JsonRpcProvider('https://ethereum-sepolia-rpc.publicnode.com');
-            
+            const provider = new ethers.JsonRpcProvider('https://ethereum-sepolia-rpc.publicnode.com');            
             const bal = await provider.getBalance(ethAddress);
             //const balanceInEth = parseFloat(ethers.utils.formatEther(bal)); // 转换为 ETH
             const balanceInEth = parseFloat(ethers.formatEther(bal));

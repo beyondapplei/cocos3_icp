@@ -8,7 +8,6 @@ import { idlFactoryBack } from "./backend.did";
 
 import { BACKEND_CANISTER_ID_LOCAL_FALLBACK, DFX_NETWORK } from "./DefData";
 import { createIcpAgent } from './IcpAgentFactory';
-// import { ethers } from '../lib3/ethers.umd.min.js'; // Removed: using global ethers from plugin script
 
 function getIcpSdkAgent(): any {
     const mod = (globalThis as any)?.DfinityAgent;

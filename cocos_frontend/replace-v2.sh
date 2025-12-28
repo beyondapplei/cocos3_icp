@@ -1,0 +1,1 @@
+sed -i '' 's|/api/v3/|/api/v2/|g' assets/Script/lib3/icp-sdk-agent.js

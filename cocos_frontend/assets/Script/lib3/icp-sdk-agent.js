@@ -3,9 +3,6 @@ var DfinityAgent = (() => {
   var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
   var __getOwnPropNames = Object.getOwnPropertyNames;
   var __hasOwnProp = Object.prototype.hasOwnProperty;
-  var __typeError = (msg) => {
-    throw TypeError(msg);
-  };
   var __export = (target, all) => {
     for (var name in all)
       __defProp(target, name, { get: all[name], enumerable: true });
@@ -19,23 +16,10 @@ var DfinityAgent = (() => {
     return to;
   };
   var __toCommonJS = (mod2) => __copyProps(__defProp({}, "__esModule", { value: true }), mod2);
-  var __accessCheck = (obj, member, msg) => member.has(obj) || __typeError("Cannot " + msg);
-  var __privateGet = (obj, member, getter) => (__accessCheck(obj, member, "read from private field"), getter ? getter.call(obj) : member.get(obj));
-  var __privateAdd = (obj, member, value) => member.has(obj) ? __typeError("Cannot add the same private member more than once") : member instanceof WeakSet ? member.add(obj) : member.set(obj, value);
-  var __privateSet = (obj, member, value, setter) => (__accessCheck(obj, member, "write to private field"), setter ? setter.call(obj, value) : member.set(obj, value), value);
-  var __privateMethod = (obj, member, method) => (__accessCheck(obj, member, "access private method"), method);
-  var __privateWrapper = (obj, member, setter, getter) => ({
-    set _(value) {
-      __privateSet(obj, member, value, setter);
-    },
-    get _() {
-      return __privateGet(obj, member, getter);
-    }
-  });
 
-  // assets/Script/Lib/bundle_entry.js
-  var bundle_entry_exports = {};
-  __export(bundle_entry_exports, {
+  // tools/entries/icp-sdk-agent-entry.js
+  var icp_sdk_agent_entry_exports = {};
+  __export(icp_sdk_agent_entry_exports, {
     Actor: () => Actor,
     AnonymousIdentity: () => AnonymousIdentity,
     Cbor: () => Cbor,
@@ -1819,9 +1803,8 @@ Call context:
     }
   };
   function formatUnknownError(error) {
-    var _a2;
     if (error instanceof Error) {
-      return (_a2 = error.stack) != null ? _a2 : error.message;
+      return error.stack ?? error.message;
     }
     try {
       return JSON.stringify(error);
@@ -1923,7 +1906,7 @@ Call context:
      * @param buffer an optional buffer to start with
      * @param length an optional amount of bytes to use for the length.
      */
-    constructor(buffer, length = (buffer == null ? void 0 : buffer.byteLength) || 0) {
+    constructor(buffer, length = buffer?.byteLength || 0) {
       if (buffer && !(buffer instanceof Uint8Array)) {
         try {
           buffer = uint8FromBufLike(buffer);
@@ -2212,8 +2195,7 @@ Call context:
       throw new Error("Byte length must be a positive integer");
     }
     let val = readUIntLE(pipe, byteLength);
-    const shift = BigInt(8) * BigInt(byteLength - 1) + BigInt(7);
-    const mul = BigInt(1) << shift;
+    const mul = BigInt(2) ** (BigInt(8) * BigInt(byteLength - 1) + BigInt(7));
     if (val >= mul) {
       val -= mul * BigInt(2);
     }
@@ -3405,13 +3387,16 @@ variant ${k2} -> ${e.message}`);
       return alternatives;
     }
   };
-  var _RecClass = class _RecClass extends ConstructType {
+  var RecClass = class _RecClass extends ConstructType {
     constructor() {
       super(...arguments);
       this._id = _RecClass._counter++;
     }
     get typeName() {
       return IdlTypeName.RecClass;
+    }
+    static {
+      this._counter = 0;
     }
     static [Symbol.hasInstance](instance) {
       return instance.typeName === IdlTypeName.RecClass;
@@ -3460,7 +3445,7 @@ variant ${k2} -> ${e.message}`);
       if (!this._type) {
         throw Error("Recursive type uninitialized.");
       }
-      return `\u03BC${this.name}.${this._type.name}`;
+      return `μ${this.name}.${this._type.name}`;
     }
     valueToString(x2) {
       if (!this._type) {
@@ -3469,8 +3454,6 @@ variant ${k2} -> ${e.message}`);
       return this._type.valueToString(x2);
     }
   };
-  _RecClass._counter = 0;
-  var RecClass = _RecClass;
   function decodePrincipalId(b2) {
     const x2 = safeReadUint8(b2);
     if (x2 !== 1) {
@@ -3561,8 +3544,7 @@ variant ${k2} -> ${e.message}`);
       T2.add(this, concat(opCode, argLen, args, retLen, rets, annLen, anns));
     }
     decodeValue(b2, t) {
-      var _a2;
-      const tt2 = t instanceof RecClass ? (_a2 = t.getType()) != null ? _a2 : t : t;
+      const tt2 = t instanceof RecClass ? t.getType() ?? t : t;
       if (!subtype(tt2, this)) {
         throw new Error(`Cannot decode function reference at type ${this.display()} from wire type ${tt2.display()}`);
       }
@@ -3590,7 +3572,7 @@ variant ${k2} -> ${e.message}`);
       const args = this.argTypes.map((arg) => arg.display()).join(", ");
       const rets = this.retTypes.map((arg) => arg.display()).join(", ");
       const annon = " " + this.annotations.join(" ");
-      return `(${args}) \u2192 (${rets})${annon}`;
+      return `(${args}) → (${rets})${annon}`;
     }
     encodeAnnotation(ann) {
       if (ann === "query") {
@@ -3648,8 +3630,7 @@ variant ${k2} -> ${e.message}`);
       T2.add(this, concat(opCode, len, ...meths));
     }
     decodeValue(b2, t) {
-      var _a2;
-      const tt2 = t instanceof RecClass ? (_a2 = t.getType()) != null ? _a2 : t : t;
+      const tt2 = t instanceof RecClass ? t.getType() ?? t : t;
       if (!subtype(tt2, this)) {
         throw new Error(`Cannot decode service reference at type ${this.display()} from wire type ${tt2.display()}`);
       }
@@ -3992,8 +3973,7 @@ variant ${k2} -> ${e.message}`);
     /// Returns whether we know for sure that a relation holds or doesn't (`true` or `false`), or
     /// if we don't know yet (`undefined`)
     known(t1, t2) {
-      var _a2;
-      return (_a2 = this.rels.get(t1.name)) == null ? void 0 : _a2.get(t2.name);
+      return this.rels.get(t1.name)?.get(t2.name);
     }
     addNegative(t1, t2) {
       this.addNames(t1.name, t2.name, false);
@@ -4232,14 +4212,14 @@ variant ${k2} -> ${e.message}`);
     }
   };
 
-  // ../../node_modules/@dfinity/cbor/dist/cbor.mjs
+  // ../../../node_modules/@dfinity/cbor/dist/cbor.mjs
   var w = class extends Error {
     constructor(n) {
       super(n), this.name = "DecodingError";
     }
   };
   var m = 55799;
-  var L = /* @__PURE__ */ Symbol("CBOR_STOP_CODE");
+  var L = Symbol("CBOR_STOP_CODE");
   var g = /* @__PURE__ */ ((t) => (t[t.False = 20] = "False", t[t.True = 21] = "True", t[t.Null = 22] = "Null", t[t.Undefined = 23] = "Undefined", t[t.Break = 31] = "Break", t))(g || {});
   var c = /* @__PURE__ */ ((t) => (t[t.UnsignedInteger = 0] = "UnsignedInteger", t[t.NegativeInteger = 1] = "NegativeInteger", t[t.ByteString = 2] = "ByteString", t[t.TextString = 3] = "TextString", t[t.Array = 4] = "Array", t[t.Map = 5] = "Map", t[t.Tag = 6] = "Tag", t[t.Simple = 7] = "Simple", t))(c || {});
   var z = 23;
@@ -4267,10 +4247,9 @@ variant ${k2} -> ${e.message}`);
   var y;
   var a = 0;
   function ut(t, n) {
-    var _a2;
     A = t, a = 0;
     const e = B(n);
-    return (_a2 = n == null ? void 0 : n(e)) != null ? _a2 : e;
+    return (n == null ? void 0 : n(e)) ?? e;
   }
   function B(t) {
     const [n, e] = N();
@@ -4302,19 +4281,18 @@ variant ${k2} -> ${e.message}`);
     return a++, [n, e];
   }
   function J(t, n) {
-    var _a2, _b2;
     const e = E(t);
     if (e === 1 / 0) {
       const u = [];
       let f = B(n);
       for (; f !== L; )
-        u.push((_a2 = n == null ? void 0 : n(f)) != null ? _a2 : f), f = B(n);
+        u.push((n == null ? void 0 : n(f)) ?? f), f = B(n);
       return u;
     }
     const i = new Array(e);
     for (let u = 0; u < e; u++) {
       const f = B(n);
-      i[u] = (_b2 = n == null ? void 0 : n(f)) != null ? _b2 : f;
+      i[u] = (n == null ? void 0 : n(f)) ?? f;
     }
     return i;
   }
@@ -4334,13 +4312,12 @@ variant ${k2} -> ${e.message}`);
     throw new w(`Unrecognized simple type: ${t.toString(2)}`);
   }
   function b(t, n) {
-    var _a2, _b2;
     const e = E(t), i = {};
     if (e === 1 / 0) {
       let [u, f] = N();
       for (; u !== c.Simple && f !== g.Break; ) {
         const l = F(f), U = B(n);
-        i[l] = (_a2 = n == null ? void 0 : n(U, l)) != null ? _a2 : U, [u, f] = N();
+        i[l] = (n == null ? void 0 : n(U, l)) ?? U, [u, f] = N();
       }
       return i;
     }
@@ -4349,7 +4326,7 @@ variant ${k2} -> ${e.message}`);
       if (f !== c.TextString)
         throw new w("Map keys must be text strings");
       const U = F(l), D = B(n);
-      i[U] = (_b2 = n == null ? void 0 : n(D, U)) != null ? _b2 : D;
+      i[U] = (n == null ? void 0 : n(D, U)) ?? D;
     }
     return i;
   }
@@ -4373,7 +4350,7 @@ variant ${k2} -> ${e.message}`);
   }
   function j(t) {
     const n = E(t);
-    return typeof n == "number" ? -1 - n : -/* @__PURE__ */ BigInt("1") - n;
+    return typeof n == "number" ? -1 - n : -1n - n;
   }
   function $(t) {
     const n = E(t);
@@ -4408,9 +4385,8 @@ variant ${k2} -> ${e.message}`);
   var s = 0;
   var O = [];
   function dt(t, n) {
-    var _a2;
     s = 0;
-    const e = (_a2 = n == null ? void 0 : n(t)) != null ? _a2 : t;
+    const e = (n == null ? void 0 : n(t)) ?? t;
     return it(m, e, n), o.slice(0, s);
   }
   function _(t, n) {
@@ -4446,14 +4422,12 @@ variant ${k2} -> ${e.message}`);
   }
   function tt(t, n) {
     I(c.Array, t.length), t.forEach((e, i) => {
-      var _a2;
-      _((_a2 = n == null ? void 0 : n(e, i.toString())) != null ? _a2 : e, n);
+      _((n == null ? void 0 : n(e, i.toString())) ?? e, n);
     });
   }
   function nt(t, n) {
     O = Object.entries(t), I(c.Map, O.length), O.forEach(([e, i]) => {
-      var _a2;
-      X(e), _((_a2 = n == null ? void 0 : n(i, e)) != null ? _a2 : i, n);
+      X(e), _((n == null ? void 0 : n(i, e)) ?? i, n);
     });
   }
   function I(t, n) {
@@ -4520,7 +4494,7 @@ variant ${k2} -> ${e.message}`);
   function ot(t) {
     T(
       c.NegativeInteger,
-      typeof t == "bigint" ? -/* @__PURE__ */ BigInt("1") - t : -1 - t
+      typeof t == "bigint" ? -1n - t : -1 - t
     );
   }
   function ft(t) {
@@ -4725,7 +4699,7 @@ variant ${k2} -> ${e.message}`);
   }
   function _abytes2(value, length, title = "") {
     const bytes = isBytes(value);
-    const len = value == null ? void 0 : value.length;
+    const len = value?.length;
     const needsLen = length !== void 0;
     if (!bytes || needsLen && len !== length) {
       const prefix = title && `"${title}" `;
@@ -6537,10 +6511,10 @@ variant ${k2} -> ${e.message}`);
     const { ShortSignature } = CURVE.G1;
     const { Signature } = CURVE.G2;
     function normP1Hash(point, htfOpts) {
-      return point instanceof G1.Point ? point : shortSignatures.hash(ensureBytes("point", point), htfOpts == null ? void 0 : htfOpts.DST);
+      return point instanceof G1.Point ? point : shortSignatures.hash(ensureBytes("point", point), htfOpts?.DST);
     }
     function normP2Hash(point, htfOpts) {
-      return point instanceof G2.Point ? point : longSignatures.hash(ensureBytes("point", point), htfOpts == null ? void 0 : htfOpts.DST);
+      return point instanceof G2.Point ? point : longSignatures.hash(ensureBytes("point", point), htfOpts?.DST);
     }
     function getPublicKey(privateKey) {
       return longSignatures.getPublicKey(privateKey).toBytes(true);
@@ -6628,20 +6602,9 @@ variant ${k2} -> ${e.message}`);
   var _1n6 = BigInt(1);
   var _2n4 = BigInt(2);
   var _3n4 = BigInt(3);
-  var bigintPow = (base, exponent) => {
-    let result = _1n6;
-    let b = base;
-    let e = exponent;
-    while (e > _0n6) {
-      if ((e & _1n6) === _1n6) result *= b;
-      b *= b;
-      e >>= _1n6;
-    }
-    return result;
-  };
   function calcFrobeniusCoefficients(Fp4, nonResidue, modulus, degree, num = 1, divisor) {
     const _divisor = BigInt(divisor === void 0 ? degree : divisor);
-    const towerModulus = bigintPow(modulus, BigInt(degree));
+    const towerModulus = modulus ** BigInt(degree);
     const res = [];
     for (let i = 0; i < num; i++) {
       const a2 = BigInt(i + 1);
@@ -6663,9 +6626,8 @@ variant ${k2} -> ${e.message}`);
       const y22 = Fp22.mul(Fp22.frobeniusMap(y2, 1), PSI_Y);
       return [x22, y22];
     }
-    const psi2Base = bigintPow(Fp4.ORDER, _2n4);
-    const PSI2_X = Fp22.pow(base, (psi2Base - _1n6) / _3n4);
-    const PSI2_Y = Fp22.pow(base, (psi2Base - _1n6) / _2n4);
+    const PSI2_X = Fp22.pow(base, (Fp4.ORDER ** _2n4 - _1n6) / _3n4);
+    const PSI2_Y = Fp22.pow(base, (Fp4.ORDER ** _2n4 - _1n6) / _2n4);
     if (!Fp22.eql(PSI2_Y, Fp22.neg(Fp22.ONE)))
       throw new Error("psiFrobenius: PSI2_Y!==-1");
     function psi2(x2, y2) {
@@ -7916,21 +7878,9 @@ variant ${k2} -> ${e.message}`);
     }
     return false;
   }
-  var _disableTimeVerification, _agent;
-  var _Certificate = class _Certificate {
-    constructor(certificate, _rootKey, _principal, _blsVerify, _maxAgeInMinutes = DEFAULT_CERTIFICATE_MAX_AGE_IN_MINUTES, disableTimeVerification = false, agent) {
-      __privateAdd(this, _disableTimeVerification, false);
-      __privateAdd(this, _agent);
-      this._rootKey = _rootKey;
-      this._principal = _principal;
-      this._blsVerify = _blsVerify;
-      this._maxAgeInMinutes = _maxAgeInMinutes;
-      __privateSet(this, _disableTimeVerification, disableTimeVerification);
-      this.cert = decode2(certificate);
-      if (agent && "getTimeDiffMsecs" in agent && "hasSyncedTime" in agent && "syncTime" in agent && "syncTimeWithSubnet" in agent) {
-        __privateSet(this, _agent, agent);
-      }
-    }
+  var Certificate = class _Certificate {
+    #disableTimeVerification = false;
+    #agent = void 0;
     /**
      * Create a new instance of a certificate, automatically verifying it.
      * @param {CreateCertificateOptions} options {@link CreateCertificateOptions}
@@ -7942,8 +7892,18 @@ variant ${k2} -> ${e.message}`);
       return cert;
     }
     static createUnverified(options) {
-      var _a2;
-      return new _Certificate(options.certificate, options.rootKey, options.principal, (_a2 = options.blsVerify) != null ? _a2 : blsVerify, options.maxAgeInMinutes, options.disableTimeVerification, options.agent);
+      return new _Certificate(options.certificate, options.rootKey, options.principal, options.blsVerify ?? blsVerify, options.maxAgeInMinutes, options.disableTimeVerification, options.agent);
+    }
+    constructor(certificate, _rootKey, _principal, _blsVerify, _maxAgeInMinutes = DEFAULT_CERTIFICATE_MAX_AGE_IN_MINUTES, disableTimeVerification = false, agent) {
+      this._rootKey = _rootKey;
+      this._principal = _principal;
+      this._blsVerify = _blsVerify;
+      this._maxAgeInMinutes = _maxAgeInMinutes;
+      this.#disableTimeVerification = disableTimeVerification;
+      this.cert = decode2(certificate);
+      if (agent && "getTimeDiffMsecs" in agent && "hasSyncedTime" in agent && "syncTime" in agent && "syncTimeWithSubnet" in agent) {
+        this.#agent = agent;
+      }
     }
     /**
      * Lookup a path in the certificate tree, using {@link lookup_path}.
@@ -7962,7 +7922,6 @@ variant ${k2} -> ${e.message}`);
       return lookup_subtree(path, this.cert.tree);
     }
     async verify() {
-      var _a2, _b2, _c;
       const rootHash = await reconstruct(this.cert.tree);
       const derKey = await this._checkDelegationAndGetKey(this.cert.delegation);
       const sig = this.cert.signature;
@@ -7972,8 +7931,8 @@ variant ${k2} -> ${e.message}`);
       if (!lookupTime) {
         throw ProtocolError.fromCode(new CertificateVerificationErrorCode("Certificate does not contain a time"));
       }
-      if (!__privateGet(this, _disableTimeVerification)) {
-        const timeDiffMsecs = (_b2 = (_a2 = __privateGet(this, _agent)) == null ? void 0 : _a2.getTimeDiffMsecs()) != null ? _b2 : 0;
+      if (!this.#disableTimeVerification) {
+        const timeDiffMsecs = this.#agent?.getTimeDiffMsecs() ?? 0;
         const maxAgeInMsec = this._maxAgeInMinutes * MINUTES_TO_MSEC;
         const now = /* @__PURE__ */ new Date();
         const adjustedNow = now.getTime() + timeDiffMsecs;
@@ -7982,14 +7941,14 @@ variant ${k2} -> ${e.message}`);
         const certTime = decodeTime(lookupTime);
         const isCertificateTimePast = certTime.getTime() < earliestCertificateTime;
         const isCertificateTimeFuture = certTime.getTime() > latestCertificateTime;
-        if ((isCertificateTimePast || isCertificateTimeFuture) && __privateGet(this, _agent) && !__privateGet(this, _agent).hasSyncedTime()) {
+        if ((isCertificateTimePast || isCertificateTimeFuture) && this.#agent && !this.#agent.hasSyncedTime()) {
           await this._syncTime();
           return await this.verify();
         }
         if (isCertificateTimePast) {
           throw TrustError.fromCode(new CertificateTimeErrorCode(this._maxAgeInMinutes, certTime, now, timeDiffMsecs, "past"));
         } else if (isCertificateTimeFuture) {
-          if ((_c = __privateGet(this, _agent)) == null ? void 0 : _c.hasSyncedTime()) {
+          if (this.#agent?.hasSyncedTime()) {
             throw UnknownError.fromCode(new UnexpectedErrorCode("System time has been synced with the IC network, but certificate is still too far in the future."));
           }
           throw TrustError.fromCode(new CertificateTimeErrorCode(5, certTime, now, timeDiffMsecs, "future"));
@@ -8013,9 +7972,9 @@ variant ${k2} -> ${e.message}`);
         rootKey: this._rootKey,
         principal: this._principal,
         blsVerify: this._blsVerify,
-        disableTimeVerification: __privateGet(this, _disableTimeVerification),
+        disableTimeVerification: this.#disableTimeVerification,
         maxAgeInMinutes: DEFAULT_CERTIFICATE_DELEGATION_MAX_AGE_IN_MINUTES,
-        agent: __privateGet(this, _agent)
+        agent: this.#agent
       });
       if (cert.cert.delegation) {
         throw ProtocolError.fromCode(new CertificateHasTooManyDelegationsErrorCode());
@@ -8049,19 +8008,16 @@ variant ${k2} -> ${e.message}`);
       return publicKeyLookup;
     }
     async _syncTime() {
-      if (!__privateGet(this, _agent)) {
+      if (!this.#agent) {
         return;
       }
       if (isCanisterPrincipal(this._principal)) {
-        await __privateGet(this, _agent).syncTime(this._principal.canisterId);
+        await this.#agent.syncTime(this._principal.canisterId);
       } else {
-        await __privateGet(this, _agent).syncTimeWithSubnet(this._principal.subnetId);
+        await this.#agent.syncTimeWithSubnet(this._principal.subnetId);
       }
     }
   };
-  _disableTimeVerification = new WeakMap();
-  _agent = new WeakMap();
-  var Certificate = _Certificate;
   function isSubnetPrincipal(principal) {
     return "subnetId" in principal;
   }
@@ -8403,13 +8359,7 @@ variant ${k2} -> ${e.message}`);
   }
 
   // node_modules/@icp-sdk/core/lib/esm/agent/utils/readState.js
-  // Precomputed bytes for: tdb26-jop6k-aogll-7ltgs-eruif-6kk7m-qpktf-gdiqx-mxtrf-vb5e6-eqe
-  // Using fromUint8Array avoids a fromText()/base32 decode + checksum step at module init,
-  // which can fail in some bundled runtimes.
-  var IC_ROOT_SUBNET_ID = Principal.fromUint8Array(new Uint8Array([
-    207, 242, 128, 227, 45, 127, 92, 205, 34, 70, 136, 47, 148, 175, 178, 15,
-    84, 202, 97, 162, 23, 101, 231, 18, 212, 61, 39, 137, 2
-  ]));
+  var IC_ROOT_SUBNET_ID = Principal.fromText("tdb26-jop6k-aogll-7ltgs-eruif-6kk7m-qpktf-gdiqx-mxtrf-vb5e6-eqe");
   function decodeValue(data, strategy) {
     switch (strategy) {
       case "raw":
@@ -9490,8 +9440,13 @@ variant ${k2} -> ${e.message}`);
   // node_modules/@icp-sdk/core/lib/esm/agent/utils/expirableMap.js
   var _a;
   var _b;
-  var _inner, _expirationTime;
   var ExpirableMap = class {
+    static {
+      _a = Symbol.iterator, _b = Symbol.toStringTag;
+    }
+    // Internals
+    #inner;
+    #expirationTime;
     /**
      * Create a new ExpirableMap.
      * @param {ExpirableMapOptions<any, any>} options - options for the map.
@@ -9499,24 +9454,21 @@ variant ${k2} -> ${e.message}`);
      * @param {number} options.expirationTime - the time in milliseconds after which entries will expire.
      */
     constructor(options = {}) {
-      // Internals
-      __privateAdd(this, _inner);
-      __privateAdd(this, _expirationTime);
       this[_a] = this.entries.bind(this);
       this[_b] = "ExpirableMap";
       const { source = [], expirationTime = 10 * 60 * 1e3 } = options;
       const currentTime = Date.now();
-      __privateSet(this, _inner, new Map([...source].map(([key, value]) => [key, { value, timestamp: currentTime }])));
-      __privateSet(this, _expirationTime, expirationTime);
+      this.#inner = new Map([...source].map(([key, value]) => [key, { value, timestamp: currentTime }]));
+      this.#expirationTime = expirationTime;
     }
     /**
      * Prune removes all expired entries.
      */
     prune() {
       const currentTime = Date.now();
-      for (const [key, entry] of __privateGet(this, _inner).entries()) {
-        if (currentTime - entry.timestamp > __privateGet(this, _expirationTime)) {
-          __privateGet(this, _inner).delete(key);
+      for (const [key, entry] of this.#inner.entries()) {
+        if (currentTime - entry.timestamp > this.#expirationTime) {
+          this.#inner.delete(key);
         }
       }
       return this;
@@ -9534,7 +9486,7 @@ variant ${k2} -> ${e.message}`);
         value,
         timestamp: Date.now()
       };
-      __privateGet(this, _inner).set(key, entry);
+      this.#inner.set(key, entry);
       return this;
     }
     /**
@@ -9543,12 +9495,12 @@ variant ${k2} -> ${e.message}`);
      * @returns the value associated with the key, or undefined if the key is not present or has expired.
      */
     get(key) {
-      const entry = __privateGet(this, _inner).get(key);
+      const entry = this.#inner.get(key);
       if (entry === void 0) {
         return void 0;
       }
-      if (Date.now() - entry.timestamp > __privateGet(this, _expirationTime)) {
-        __privateGet(this, _inner).delete(key);
+      if (Date.now() - entry.timestamp > this.#expirationTime) {
+        this.#inner.delete(key);
         return void 0;
       }
       return entry.value;
@@ -9557,14 +9509,14 @@ variant ${k2} -> ${e.message}`);
      * Clear all entries.
      */
     clear() {
-      __privateGet(this, _inner).clear();
+      this.#inner.clear();
     }
     /**
      * Entries returns the entries of the map, without the expiration time.
      * @returns an iterator over the entries of the map.
      */
     entries() {
-      const iterator = __privateGet(this, _inner).entries();
+      const iterator = this.#inner.entries();
       const generator = function* () {
         for (const [key, value] of iterator) {
           yield [key, value.value];
@@ -9578,7 +9530,7 @@ variant ${k2} -> ${e.message}`);
      * @returns an iterator over the values of the map.
      */
     values() {
-      const iterator = __privateGet(this, _inner).values();
+      const iterator = this.#inner.values();
       const generator = function* () {
         for (const value of iterator) {
           yield value.value;
@@ -9592,7 +9544,7 @@ variant ${k2} -> ${e.message}`);
      * @returns an iterator over the keys of the map.
      */
     keys() {
-      return __privateGet(this, _inner).keys();
+      return this.#inner.keys();
     }
     /**
      * forEach calls the callbackfn on each entry of the map.
@@ -9600,7 +9552,7 @@ variant ${k2} -> ${e.message}`);
      * @param thisArg to use as this when calling the callbackfn
      */
     forEach(callbackfn, thisArg) {
-      for (const [key, value] of __privateGet(this, _inner).entries()) {
+      for (const [key, value] of this.#inner.entries()) {
         callbackfn.call(thisArg, value.value, key, this);
       }
     }
@@ -9610,7 +9562,7 @@ variant ${k2} -> ${e.message}`);
      * @returns true if the key exists and has not expired.
      */
     has(key) {
-      return __privateGet(this, _inner).has(key);
+      return this.#inner.has(key);
     }
     /**
      * delete the entry for the given key.
@@ -9618,19 +9570,16 @@ variant ${k2} -> ${e.message}`);
      * @returns true if the key existed and has been deleted.
      */
     delete(key) {
-      return __privateGet(this, _inner).delete(key);
+      return this.#inner.delete(key);
     }
     /**
      * get size of the map.
      * @returns the size of the map.
      */
     get size() {
-      return __privateGet(this, _inner).size;
+      return this.#inner.size;
     }
   };
-  _inner = new WeakMap();
-  _expirationTime = new WeakMap();
-  _a = Symbol.iterator, _b = Symbol.toStringTag;
 
   // node_modules/@icp-sdk/core/lib/esm/agent/der.js
   var encodeLenBytes = (len) => {
@@ -9773,18 +9722,7 @@ variant ${k2} -> ${e.message}`);
   };
 
   // node_modules/@icp-sdk/core/lib/esm/agent/public_key.js
-  var _rawKey, _derKey;
-  var _Ed25519PublicKey = class _Ed25519PublicKey {
-    // `fromRaw` and `fromDer` should be used for instantiation, not this constructor.
-    constructor(key) {
-      __privateAdd(this, _rawKey);
-      __privateAdd(this, _derKey);
-      if (key.byteLength !== _Ed25519PublicKey.RAW_KEY_LENGTH) {
-        throw InputError.fromCode(new DerDecodeErrorCode("An Ed25519 public key must be exactly 32 bytes long"));
-      }
-      __privateSet(this, _rawKey, key);
-      __privateSet(this, _derKey, _Ed25519PublicKey.derEncode(key));
-    }
+  var Ed25519PublicKey = class _Ed25519PublicKey {
     static from(key) {
       return this.fromDer(key.toDer());
     }
@@ -9793,6 +9731,9 @@ variant ${k2} -> ${e.message}`);
     }
     static fromDer(derKey) {
       return new _Ed25519PublicKey(this.derDecode(derKey));
+    }
+    static {
+      this.RAW_KEY_LENGTH = 32;
     }
     static derEncode(publicKey) {
       return wrapDER(publicKey, ED25519_OID);
@@ -9804,11 +9745,21 @@ variant ${k2} -> ${e.message}`);
       }
       return unwrapped;
     }
+    #rawKey;
     get rawKey() {
-      return __privateGet(this, _rawKey);
+      return this.#rawKey;
     }
+    #derKey;
     get derKey() {
-      return __privateGet(this, _derKey);
+      return this.#derKey;
+    }
+    // `fromRaw` and `fromDer` should be used for instantiation, not this constructor.
+    constructor(key) {
+      if (key.byteLength !== _Ed25519PublicKey.RAW_KEY_LENGTH) {
+        throw InputError.fromCode(new DerDecodeErrorCode("An Ed25519 public key must be exactly 32 bytes long"));
+      }
+      this.#rawKey = key;
+      this.#derKey = _Ed25519PublicKey.derEncode(key);
     }
     toDer() {
       return this.derKey;
@@ -9817,10 +9768,6 @@ variant ${k2} -> ${e.message}`);
       return this.rawKey;
     }
   };
-  _rawKey = new WeakMap();
-  _derKey = new WeakMap();
-  _Ed25519PublicKey.RAW_KEY_LENGTH = 32;
-  var Ed25519PublicKey = _Ed25519PublicKey;
 
   // node_modules/@icp-sdk/core/lib/esm/agent/observable.js
   var Observable = class {
@@ -9859,50 +9806,61 @@ variant ${k2} -> ${e.message}`);
   var MAX_INTERVAL_MSEC = 6e4;
   var MAX_ELAPSED_TIME_MSEC = 9e5;
   var MAX_ITERATIONS = 10;
-  var _currentInterval, _randomizationFactor, _multiplier, _maxInterval, _startTime, _maxElapsedTime, _maxIterations, _date, _count;
-  var _ExponentialBackoff = class _ExponentialBackoff {
+  var ExponentialBackoff = class _ExponentialBackoff {
+    #currentInterval;
+    #randomizationFactor;
+    #multiplier;
+    #maxInterval;
+    #startTime;
+    #maxElapsedTime;
+    #maxIterations;
+    #date;
+    #count = 0;
+    static {
+      this.default = {
+        initialInterval: INITIAL_INTERVAL_MSEC,
+        randomizationFactor: RANDOMIZATION_FACTOR,
+        multiplier: MULTIPLIER,
+        maxInterval: MAX_INTERVAL_MSEC,
+        // 1 minute
+        maxElapsedTime: MAX_ELAPSED_TIME_MSEC,
+        maxIterations: MAX_ITERATIONS,
+        date: Date
+      };
+    }
     constructor(options = _ExponentialBackoff.default) {
-      __privateAdd(this, _currentInterval);
-      __privateAdd(this, _randomizationFactor);
-      __privateAdd(this, _multiplier);
-      __privateAdd(this, _maxInterval);
-      __privateAdd(this, _startTime);
-      __privateAdd(this, _maxElapsedTime);
-      __privateAdd(this, _maxIterations);
-      __privateAdd(this, _date);
-      __privateAdd(this, _count, 0);
       const { initialInterval = INITIAL_INTERVAL_MSEC, randomizationFactor = RANDOMIZATION_FACTOR, multiplier = MULTIPLIER, maxInterval = MAX_INTERVAL_MSEC, maxElapsedTime = MAX_ELAPSED_TIME_MSEC, maxIterations = MAX_ITERATIONS, date = Date } = options;
-      __privateSet(this, _currentInterval, initialInterval);
-      __privateSet(this, _randomizationFactor, randomizationFactor);
-      __privateSet(this, _multiplier, multiplier);
-      __privateSet(this, _maxInterval, maxInterval);
-      __privateSet(this, _date, date);
-      __privateSet(this, _startTime, date.now());
-      __privateSet(this, _maxElapsedTime, maxElapsedTime);
-      __privateSet(this, _maxIterations, maxIterations);
+      this.#currentInterval = initialInterval;
+      this.#randomizationFactor = randomizationFactor;
+      this.#multiplier = multiplier;
+      this.#maxInterval = maxInterval;
+      this.#date = date;
+      this.#startTime = date.now();
+      this.#maxElapsedTime = maxElapsedTime;
+      this.#maxIterations = maxIterations;
     }
     get ellapsedTimeInMsec() {
-      return __privateGet(this, _date).now() - __privateGet(this, _startTime);
+      return this.#date.now() - this.#startTime;
     }
     get currentInterval() {
-      return __privateGet(this, _currentInterval);
+      return this.#currentInterval;
     }
     get count() {
-      return __privateGet(this, _count);
+      return this.#count;
     }
     get randomValueFromInterval() {
-      const delta = __privateGet(this, _randomizationFactor) * __privateGet(this, _currentInterval);
-      const min = __privateGet(this, _currentInterval) - delta;
-      const max = __privateGet(this, _currentInterval) + delta;
+      const delta = this.#randomizationFactor * this.#currentInterval;
+      const min = this.#currentInterval - delta;
+      const max = this.#currentInterval + delta;
       return Math.random() * (max - min) + min;
     }
     incrementCurrentInterval() {
-      __privateSet(this, _currentInterval, Math.min(__privateGet(this, _currentInterval) * __privateGet(this, _multiplier), __privateGet(this, _maxInterval)));
-      __privateWrapper(this, _count)._++;
-      return __privateGet(this, _currentInterval);
+      this.#currentInterval = Math.min(this.#currentInterval * this.#multiplier, this.#maxInterval);
+      this.#count++;
+      return this.#currentInterval;
     }
     next() {
-      if (this.ellapsedTimeInMsec >= __privateGet(this, _maxElapsedTime) || __privateGet(this, _count) >= __privateGet(this, _maxIterations)) {
+      if (this.ellapsedTimeInMsec >= this.#maxElapsedTime || this.#count >= this.#maxIterations) {
         return null;
       } else {
         this.incrementCurrentInterval();
@@ -9910,26 +9868,6 @@ variant ${k2} -> ${e.message}`);
       }
     }
   };
-  _currentInterval = new WeakMap();
-  _randomizationFactor = new WeakMap();
-  _multiplier = new WeakMap();
-  _maxInterval = new WeakMap();
-  _startTime = new WeakMap();
-  _maxElapsedTime = new WeakMap();
-  _maxIterations = new WeakMap();
-  _date = new WeakMap();
-  _count = new WeakMap();
-  _ExponentialBackoff.default = {
-    initialInterval: INITIAL_INTERVAL_MSEC,
-    randomizationFactor: RANDOMIZATION_FACTOR,
-    multiplier: MULTIPLIER,
-    maxInterval: MAX_INTERVAL_MSEC,
-    // 1 minute
-    maxElapsedTime: MAX_ELAPSED_TIME_MSEC,
-    maxIterations: MAX_ITERATIONS,
-    date: Date
-  };
-  var ExponentialBackoff = _ExponentialBackoff;
 
   // node_modules/@icp-sdk/core/lib/esm/agent/agent/http/index.js
   var RequestStatusResponseStatus;
@@ -9990,7 +9928,7 @@ variant ${k2} -> ${e.message}`);
       const knownHosts = ["ic0.app", "icp0.io", "127.0.0.1", "localhost"];
       const remoteHosts = [".github.dev", ".gitpod.io"];
       const location = typeof window !== "undefined" ? window.location : void 0;
-      const hostname = location == null ? void 0 : location.hostname;
+      const hostname = location?.hostname;
       let knownHost;
       if (hostname && typeof hostname === "string") {
         if (remoteHosts.some((host2) => hostname.endsWith(host2))) {
@@ -10007,58 +9945,51 @@ variant ${k2} -> ${e.message}`);
     }
     return host.toString();
   }
-  var _rootKeyPromise, _shouldFetchRootKey, _timeDiffMsecs, _hasSyncedTime, _syncTimePromise, _shouldSyncTime, _identity, _fetch, _fetchOptions, _callOptions, _credentials, _retryTimes, _backoffStrategy, _maxIngressExpiryInMinutes, _HttpAgent_instances, maxIngressExpiryInMs_get, _queryPipeline, _updatePipeline, _subnetKeys, _verifyQuerySignatures, requestAndRetryQuery_fn, requestAndRetry_fn, _verifyQueryResponse, readStateInner_fn, setTimeDiffMsecs_fn, asyncGuard_fn, rootKeyGuard_fn, syncTimeGuard_fn;
-  var _HttpAgent = class _HttpAgent {
+  var HttpAgent = class _HttpAgent {
+    #rootKeyPromise;
+    #shouldFetchRootKey;
+    #timeDiffMsecs;
+    #hasSyncedTime;
+    #syncTimePromise;
+    #shouldSyncTime;
+    #identity;
+    #fetch;
+    #fetchOptions;
+    #callOptions;
+    #credentials;
+    #retryTimes;
+    // Retry requests N times before erroring by default
+    #backoffStrategy;
+    #maxIngressExpiryInMinutes;
+    get #maxIngressExpiryInMs() {
+      return this.#maxIngressExpiryInMinutes * MINUTE_TO_MSECS;
+    }
+    #queryPipeline;
+    #updatePipeline;
+    #subnetKeys;
+    #verifyQuerySignatures;
     /**
      * @param options - Options for the HttpAgent
      * @deprecated Use `HttpAgent.create` or `HttpAgent.createSync` instead
      */
     constructor(options = {}) {
-      __privateAdd(this, _HttpAgent_instances);
-      __privateAdd(this, _rootKeyPromise);
-      __privateAdd(this, _shouldFetchRootKey);
-      __privateAdd(this, _timeDiffMsecs);
-      __privateAdd(this, _hasSyncedTime);
-      __privateAdd(this, _syncTimePromise);
-      __privateAdd(this, _shouldSyncTime);
-      __privateAdd(this, _identity);
-      __privateAdd(this, _fetch);
-      __privateAdd(this, _fetchOptions);
-      __privateAdd(this, _callOptions);
-      __privateAdd(this, _credentials);
-      __privateAdd(this, _retryTimes);
-      // Retry requests N times before erroring by default
-      __privateAdd(this, _backoffStrategy);
-      __privateAdd(this, _maxIngressExpiryInMinutes);
-      __privateAdd(this, _queryPipeline);
-      __privateAdd(this, _updatePipeline);
-      __privateAdd(this, _subnetKeys);
-      __privateAdd(this, _verifyQuerySignatures);
-      /**
-       * See https://internetcomputer.org/docs/current/references/ic-interface-spec/#http-query for details on validation
-       * @param queryResponse - The response from the query
-       * @param subnetNodeKeys - The subnet node keys
-       * @returns ApiQueryResponse
-       */
-      __privateAdd(this, _verifyQueryResponse);
-      var _a2, _b2, _c;
-      __privateSet(this, _rootKeyPromise, null);
-      __privateSet(this, _shouldFetchRootKey, false);
-      __privateSet(this, _timeDiffMsecs, DEFAULT_TIME_DIFF_MSECS);
-      __privateSet(this, _hasSyncedTime, false);
-      __privateSet(this, _syncTimePromise, null);
-      __privateSet(this, _shouldSyncTime, false);
+      this.#rootKeyPromise = null;
+      this.#shouldFetchRootKey = false;
+      this.#timeDiffMsecs = DEFAULT_TIME_DIFF_MSECS;
+      this.#hasSyncedTime = false;
+      this.#syncTimePromise = null;
+      this.#shouldSyncTime = false;
       this._isAgent = true;
       this.config = {};
       this.log = new ObservableLog();
-      __privateSet(this, _queryPipeline, []);
-      __privateSet(this, _updatePipeline, []);
-      __privateSet(this, _subnetKeys, new ExpirableMap({
+      this.#queryPipeline = [];
+      this.#updatePipeline = [];
+      this.#subnetKeys = new ExpirableMap({
         expirationTime: 5 * MINUTE_TO_MSECS
-      }));
-      __privateSet(this, _verifyQuerySignatures, true);
-      __privateSet(this, _verifyQueryResponse, (queryResponse, subnetNodeKeys) => {
-        if (__privateGet(this, _verifyQuerySignatures) === false) {
+      });
+      this.#verifyQuerySignatures = true;
+      this.#verifyQueryResponse = (queryResponse, subnetNodeKeys) => {
+        if (this.#verifyQuerySignatures === false) {
           return queryResponse;
         }
         const { status, signatures = [], requestId } = queryResponse;
@@ -10099,16 +10030,16 @@ variant ${k2} -> ${e.message}`);
           }
         }
         return queryResponse;
-      });
+      };
       this.config = options;
-      __privateSet(this, _fetch, options.fetch || getDefaultFetch() || fetch.bind(global));
-      __privateSet(this, _fetchOptions, options.fetchOptions);
-      __privateSet(this, _callOptions, options.callOptions);
-      __privateSet(this, _shouldFetchRootKey, (_a2 = options.shouldFetchRootKey) != null ? _a2 : false);
-      __privateSet(this, _shouldSyncTime, (_b2 = options.shouldSyncTime) != null ? _b2 : false);
+      this.#fetch = options.fetch || getDefaultFetch() || fetch.bind(global);
+      this.#fetchOptions = options.fetchOptions;
+      this.#callOptions = options.callOptions;
+      this.#shouldFetchRootKey = options.shouldFetchRootKey ?? false;
+      this.#shouldSyncTime = options.shouldSyncTime ?? false;
       if (options.rootKey) {
         this.rootKey = options.rootKey;
-      } else if (__privateGet(this, _shouldFetchRootKey)) {
+      } else if (this.#shouldFetchRootKey) {
         this.rootKey = null;
       } else {
         this.rootKey = hexToBytes(IC_ROOT_KEY);
@@ -10116,13 +10047,13 @@ variant ${k2} -> ${e.message}`);
       const host = determineHost(options.host);
       this.host = new URL(host);
       if (options.verifyQuerySignatures !== void 0) {
-        __privateSet(this, _verifyQuerySignatures, options.verifyQuerySignatures);
+        this.#verifyQuerySignatures = options.verifyQuerySignatures;
       }
-      __privateSet(this, _retryTimes, (_c = options.retryTimes) != null ? _c : 3);
+      this.#retryTimes = options.retryTimes ?? 3;
       const defaultBackoffFactory = () => new ExponentialBackoff({
-        maxIterations: __privateGet(this, _retryTimes)
+        maxIterations: this.#retryTimes
       });
-      __privateSet(this, _backoffStrategy, options.backoffStrategy || defaultBackoffFactory);
+      this.#backoffStrategy = options.backoffStrategy || defaultBackoffFactory;
       if (this.host.hostname.endsWith(IC0_SUB_DOMAIN)) {
         this.host.hostname = IC0_DOMAIN;
       } else if (this.host.hostname.endsWith(ICP0_SUB_DOMAIN)) {
@@ -10132,16 +10063,16 @@ variant ${k2} -> ${e.message}`);
       }
       if (options.credentials) {
         const { name, password } = options.credentials;
-        __privateSet(this, _credentials, `${name}${password ? ":" + password : ""}`);
+        this.#credentials = `${name}${password ? ":" + password : ""}`;
       }
-      __privateSet(this, _identity, Promise.resolve(options.identity || new AnonymousIdentity()));
+      this.#identity = Promise.resolve(options.identity || new AnonymousIdentity());
       if (options.ingressExpiryInMinutes && options.ingressExpiryInMinutes > 5) {
         throw InputError.fromCode(new IngressExpiryInvalidErrorCode("The maximum ingress expiry time is 5 minutes.", options.ingressExpiryInMinutes));
       }
       if (options.ingressExpiryInMinutes && options.ingressExpiryInMinutes <= 0) {
         throw InputError.fromCode(new IngressExpiryInvalidErrorCode("Ingress expiry time must be greater than 0.", options.ingressExpiryInMinutes));
       }
-      __privateSet(this, _maxIngressExpiryInMinutes, options.ingressExpiryInMinutes || 5);
+      this.#maxIngressExpiryInMinutes = options.ingressExpiryInMinutes || 5;
       this.addTransform("update", makeNonceTransform(makeNonce));
       if (options.useQueryNonces) {
         this.addTransform("query", makeNonceTransform(makeNonce));
@@ -10162,13 +10093,11 @@ variant ${k2} -> ${e.message}`);
       return new this({ ...options });
     }
     static async create(options = {}) {
-      var _a2;
       const agent = _HttpAgent.createSync(options);
-      await __privateMethod(_a2 = agent, _HttpAgent_instances, asyncGuard_fn).call(_a2);
+      await agent.#asyncGuard();
       return agent;
     }
     static async from(agent) {
-      var _a2;
       try {
         if ("config" in agent) {
           return await _HttpAgent.create(agent.config);
@@ -10178,7 +10107,7 @@ variant ${k2} -> ${e.message}`);
           fetchOptions: agent._fetchOptions,
           callOptions: agent._callOptions,
           host: agent._host.toString(),
-          identity: (_a2 = agent._identity) != null ? _a2 : void 0
+          identity: agent._identity ?? void 0
         });
       } catch {
         throw InputError.fromCode(new CreateHttpAgentErrorCode());
@@ -10190,18 +10119,18 @@ variant ${k2} -> ${e.message}`);
     }
     addTransform(type, fn, priority = fn.priority || 0) {
       if (type === "update") {
-        const i = __privateGet(this, _updatePipeline).findIndex((x2) => (x2.priority || 0) < priority);
-        __privateGet(this, _updatePipeline).splice(i >= 0 ? i : __privateGet(this, _updatePipeline).length, 0, Object.assign(fn, { priority }));
+        const i = this.#updatePipeline.findIndex((x2) => (x2.priority || 0) < priority);
+        this.#updatePipeline.splice(i >= 0 ? i : this.#updatePipeline.length, 0, Object.assign(fn, { priority }));
       } else if (type === "query") {
-        const i = __privateGet(this, _queryPipeline).findIndex((x2) => (x2.priority || 0) < priority);
-        __privateGet(this, _queryPipeline).splice(i >= 0 ? i : __privateGet(this, _queryPipeline).length, 0, Object.assign(fn, { priority }));
+        const i = this.#queryPipeline.findIndex((x2) => (x2.priority || 0) < priority);
+        this.#queryPipeline.splice(i >= 0 ? i : this.#queryPipeline.length, 0, Object.assign(fn, { priority }));
       }
     }
     async getPrincipal() {
-      if (!__privateGet(this, _identity)) {
+      if (!this.#identity) {
         throw ExternalError.fromCode(new IdentityInvalidErrorCode());
       }
-      return (await __privateGet(this, _identity)).getPrincipal();
+      return (await this.#identity).getPrincipal();
     }
     /**
      * Makes a call to a canister method.
@@ -10216,17 +10145,16 @@ variant ${k2} -> ${e.message}`);
      * @returns A promise that resolves to the response of the call, including the request ID and response details.
      */
     async call(canisterId, options, identity) {
-      var _a2;
-      const callSync = (_a2 = options.callSync) != null ? _a2 : true;
-      const id = await (identity != null ? identity : __privateGet(this, _identity));
+      const callSync = options.callSync ?? true;
+      const id = await (identity ?? this.#identity);
       if (!id) {
         throw ExternalError.fromCode(new IdentityInvalidErrorCode());
       }
       const canister = Principal.from(canisterId);
       const ecid = options.effectiveCanisterId ? Principal.from(options.effectiveCanisterId) : canister;
-      await __privateMethod(this, _HttpAgent_instances, asyncGuard_fn).call(this, ecid);
+      await this.#asyncGuard(ecid);
       const sender = id.getPrincipal();
-      const ingress_expiry = calculateIngressExpiry(__privateGet(this, _maxIngressExpiryInMinutes), __privateGet(this, _timeDiffMsecs));
+      const ingress_expiry = calculateIngressExpiry(this.#maxIngressExpiryInMinutes, this.#timeDiffMsecs);
       const submit = {
         request_type: SubmitRequestType.Call,
         canister_id: canister,
@@ -10241,14 +10169,14 @@ variant ${k2} -> ${e.message}`);
           method: "POST",
           headers: {
             "Content-Type": "application/cbor",
-            ...__privateGet(this, _credentials) ? { Authorization: "Basic " + btoa(__privateGet(this, _credentials)) } : {}
+            ...this.#credentials ? { Authorization: "Basic " + btoa(this.#credentials) } : {}
           }
         },
         endpoint: Endpoint.Call,
         body: submit
       });
       let nonce;
-      if (options == null ? void 0 : options.nonce) {
+      if (options?.nonce) {
         nonce = toNonce(options.nonce);
       } else if (transformedRequest.body.nonce) {
         nonce = toNonce(transformedRequest.body.nonce);
@@ -10261,14 +10189,14 @@ variant ${k2} -> ${e.message}`);
       }
       transformedRequest = await id.transformRequest(transformedRequest);
       const body = encode2(transformedRequest.body);
-      const backoff2 = __privateGet(this, _backoffStrategy).call(this);
+      const backoff2 = this.#backoffStrategy();
       const requestId = requestIdOf(submit);
       try {
         const requestSync = () => {
-          const url = new URL(`/api/v2/canister/${ecid.toText()}/call`, this.host);
+          const url = new URL(`/api/v4/canister/${ecid.toText()}/call`, this.host);
           this.log.print(`fetching "${url.pathname}" with request:`, transformedRequest);
-          return __privateGet(this, _fetch).call(this, url, {
-            ...__privateGet(this, _callOptions),
+          return this.#fetch(url, {
+            ...this.#callOptions,
             ...transformedRequest.request,
             body
           });
@@ -10276,14 +10204,14 @@ variant ${k2} -> ${e.message}`);
         const requestAsync = () => {
           const url = new URL(`/api/v2/canister/${ecid.toText()}/call`, this.host);
           this.log.print(`fetching "${url.pathname}" with request:`, transformedRequest);
-          return __privateGet(this, _fetch).call(this, url, {
-            ...__privateGet(this, _callOptions),
+          return this.#fetch(url, {
+            ...this.#callOptions,
             ...transformedRequest.request,
             body
           });
         };
         const requestFn = callSync ? requestSync : requestAsync;
-        const { responseBodyBytes, ...response } = await __privateMethod(this, _HttpAgent_instances, requestAndRetry_fn).call(this, {
+        const { responseBodyBytes, ...response } = await this.#requestAndRetry({
           requestFn,
           backoff: backoff2,
           tries: 0
@@ -10307,7 +10235,7 @@ variant ${k2} -> ${e.message}`);
               // disable v4 api
               callSync: false
             }, identity);
-          } else if (error.hasCode(IngressExpiryInvalidErrorCode) && !__privateGet(this, _hasSyncedTime)) {
+          } else if (error.hasCode(IngressExpiryInvalidErrorCode) && !this.#hasSyncedTime) {
             await this.syncTime(canister);
             return this.call(canister, options, identity);
           } else {
@@ -10326,20 +10254,155 @@ variant ${k2} -> ${e.message}`);
         throw callError;
       }
     }
+    async #requestAndRetryQuery(args) {
+      const { ecid, transformedRequest, body, requestId, backoff: backoff2, tries } = args;
+      const delay = tries === 0 ? 0 : backoff2.next();
+      const url = new URL(`/api/v2/canister/${ecid.toString()}/query`, this.host);
+      this.log.print(`fetching "${url.pathname}" with tries:`, {
+        tries,
+        backoff: backoff2,
+        delay
+      });
+      if (delay === null) {
+        throw UnknownError.fromCode(new TimeoutWaitingForResponseErrorCode(`Backoff strategy exhausted after ${tries} attempts.`, requestId));
+      }
+      if (delay > 0) {
+        await new Promise((resolve) => setTimeout(resolve, delay));
+      }
+      let fetchResponse;
+      try {
+        this.log.print(`fetching "${url.pathname}" with request:`, transformedRequest);
+        fetchResponse = await this.#fetch(url, {
+          ...this.#fetchOptions,
+          ...transformedRequest.request,
+          body
+        });
+      } catch (error) {
+        if (tries < this.#retryTimes) {
+          this.log.warn(`Caught exception while attempting to make query:
+  ${error}
+  Retrying query.`);
+          return await this.#requestAndRetryQuery({ ...args, tries: tries + 1 });
+        }
+        throw TransportError.fromCode(new HttpFetchErrorCode(error));
+      }
+      const headers = httpHeadersTransform(fetchResponse.headers);
+      if (fetchResponse.status !== HTTP_STATUS_OK) {
+        const responseText = await fetchResponse.text();
+        if (isIngressExpiryInvalidResponse(responseText)) {
+          throw InputError.fromCode(new IngressExpiryInvalidErrorCode(responseText, this.#maxIngressExpiryInMinutes));
+        }
+        if (tries < this.#retryTimes) {
+          return await this.#requestAndRetryQuery({ ...args, tries: tries + 1 });
+        }
+        throw ProtocolError.fromCode(new HttpErrorCode(fetchResponse.status, fetchResponse.statusText, headers, responseText));
+      }
+      const queryResponse = decode2(uint8FromBufLike2(await fetchResponse.arrayBuffer()));
+      const response = {
+        ...queryResponse,
+        httpDetails: {
+          ok: fetchResponse.ok,
+          status: fetchResponse.status,
+          statusText: fetchResponse.statusText,
+          headers
+        },
+        requestId
+      };
+      if (!this.#verifyQuerySignatures) {
+        return response;
+      }
+      const signatureTimestampNs = response.signatures?.[0]?.timestamp;
+      if (!signatureTimestampNs) {
+        throw ProtocolError.fromCode(new MalformedSignatureErrorCode("Timestamp not found in query response. This suggests a malformed or malicious response."));
+      }
+      const signatureTimestampMs = Number(BigInt(signatureTimestampNs) / BigInt(MSECS_TO_NANOSECONDS));
+      const currentTimestampInMs = Date.now() + this.#timeDiffMsecs;
+      if (currentTimestampInMs - signatureTimestampMs > this.#maxIngressExpiryInMs) {
+        if (tries < this.#retryTimes) {
+          this.log.warn("Timestamp is older than the max ingress expiry. Retrying query.", {
+            requestId,
+            signatureTimestampMs
+          });
+          await this.syncTime(ecid);
+          return await this.#requestAndRetryQuery({ ...args, tries: tries + 1 });
+        }
+        throw TrustError.fromCode(new CertificateOutdatedErrorCode(this.#maxIngressExpiryInMinutes, requestId, tries));
+      }
+      return response;
+    }
+    /**
+     * Makes a request and retries if it fails.
+     * @param args - The arguments for the request.
+     * @param args.requestFn - A function that returns a Promise resolving to a Response.
+     * @param args.backoff - The backoff strategy to use for retries.
+     * @param args.tries - The number of retry attempts made so far.
+     * @returns The response from the request, if the status is 200 or 202.
+     * See the https://internetcomputer.org/docs/references/ic-interface-spec#http-interface for details on the response statuses.
+     * @throws {ProtocolError} if the response status is not 200 or 202, and the retry limit has been reached.
+     * @throws {TransportError} if the request fails, and the retry limit has been reached.
+     */
+    async #requestAndRetry(args) {
+      const { requestFn, backoff: backoff2, tries } = args;
+      const delay = tries === 0 ? 0 : backoff2.next();
+      if (delay === null) {
+        throw ProtocolError.fromCode(new TimeoutWaitingForResponseErrorCode(`Retry strategy exhausted after ${tries} attempts.`));
+      }
+      if (delay > 0) {
+        await new Promise((resolve) => setTimeout(resolve, delay));
+      }
+      let response;
+      let responseBodyBytes = new Uint8Array();
+      try {
+        response = await requestFn();
+        if (response.status === HTTP_STATUS_OK) {
+          responseBodyBytes = uint8FromBufLike2(await response.clone().arrayBuffer());
+        }
+      } catch (error) {
+        if (tries < this.#retryTimes) {
+          this.log.warn(`Caught exception while attempting to make request:
+  ${error}
+  Retrying request.`);
+          return await this.#requestAndRetry({ requestFn, backoff: backoff2, tries: tries + 1 });
+        }
+        throw TransportError.fromCode(new HttpFetchErrorCode(error));
+      }
+      const headers = httpHeadersTransform(response.headers);
+      if (response.status === HTTP_STATUS_OK || response.status === HTTP_STATUS_ACCEPTED) {
+        return {
+          ok: response.ok,
+          // should always be true
+          status: response.status,
+          statusText: response.statusText,
+          responseBodyBytes,
+          headers
+        };
+      }
+      const responseText = await response.text();
+      if (response.status === HTTP_STATUS_NOT_FOUND && response.url.includes("api/v4")) {
+        throw ProtocolError.fromCode(new HttpV4ApiNotSupportedErrorCode());
+      }
+      if (isIngressExpiryInvalidResponse(responseText)) {
+        throw InputError.fromCode(new IngressExpiryInvalidErrorCode(responseText, this.#maxIngressExpiryInMinutes));
+      }
+      if (tries < this.#retryTimes) {
+        return await this.#requestAndRetry({ requestFn, backoff: backoff2, tries: tries + 1 });
+      }
+      throw ProtocolError.fromCode(new HttpErrorCode(response.status, response.statusText, headers, responseText));
+    }
     async query(canisterId, fields, identity) {
-      const backoff2 = __privateGet(this, _backoffStrategy).call(this);
+      const backoff2 = this.#backoffStrategy();
       const ecid = fields.effectiveCanisterId ? Principal.from(fields.effectiveCanisterId) : Principal.from(canisterId);
-      await __privateMethod(this, _HttpAgent_instances, asyncGuard_fn).call(this, ecid);
+      await this.#asyncGuard(ecid);
       this.log.print(`ecid ${ecid.toString()}`);
       this.log.print(`canisterId ${canisterId.toString()}`);
       let transformedRequest;
-      const id = await (identity != null ? identity : __privateGet(this, _identity));
+      const id = await (identity ?? this.#identity);
       if (!id) {
         throw ExternalError.fromCode(new IdentityInvalidErrorCode());
       }
       const canister = Principal.from(canisterId);
       const sender = id.getPrincipal();
-      const ingressExpiry = calculateIngressExpiry(__privateGet(this, _maxIngressExpiryInMinutes), __privateGet(this, _timeDiffMsecs));
+      const ingressExpiry = calculateIngressExpiry(this.#maxIngressExpiryInMinutes, this.#timeDiffMsecs);
       const request3 = {
         request_type: ReadRequestType.Query,
         canister_id: canister,
@@ -10354,7 +10417,7 @@ variant ${k2} -> ${e.message}`);
           method: "POST",
           headers: {
             "Content-Type": "application/cbor",
-            ...__privateGet(this, _credentials) ? { Authorization: "Basic " + btoa(__privateGet(this, _credentials)) } : {}
+            ...this.#credentials ? { Authorization: "Basic " + btoa(this.#credentials) } : {}
           }
         },
         endpoint: Endpoint.Query,
@@ -10372,26 +10435,26 @@ variant ${k2} -> ${e.message}`);
         tries: 0
       };
       const makeQuery = async () => {
-        const query = await __privateMethod(this, _HttpAgent_instances, requestAndRetryQuery_fn).call(this, args);
+        const query = await this.#requestAndRetryQuery(args);
         return {
           requestDetails: request3,
           ...query
         };
       };
       const getSubnetNodeKeys = async () => {
-        const cachedSubnetNodeKeys = __privateGet(this, _subnetKeys).get(ecid.toString());
+        const cachedSubnetNodeKeys = this.#subnetKeys.get(ecid.toString());
         if (cachedSubnetNodeKeys) {
           return cachedSubnetNodeKeys;
         }
         await this.fetchSubnetKeys(ecid.toString());
-        const subnetNodeKeys = __privateGet(this, _subnetKeys).get(ecid.toString());
+        const subnetNodeKeys = this.#subnetKeys.get(ecid.toString());
         if (!subnetNodeKeys) {
           throw TrustError.fromCode(new MissingSignatureErrorCode());
         }
         return subnetNodeKeys;
       };
       try {
-        if (!__privateGet(this, _verifyQuerySignatures)) {
+        if (!this.#verifyQuerySignatures) {
           return await makeQuery();
         }
         const [queryWithDetails, subnetNodeKeys] = await Promise.all([
@@ -10399,17 +10462,17 @@ variant ${k2} -> ${e.message}`);
           getSubnetNodeKeys()
         ]);
         try {
-          return __privateGet(this, _verifyQueryResponse).call(this, queryWithDetails, subnetNodeKeys);
+          return this.#verifyQueryResponse(queryWithDetails, subnetNodeKeys);
         } catch {
           this.log.warn("Query response verification failed. Retrying with fresh subnet keys.");
-          __privateGet(this, _subnetKeys).delete(ecid.toString());
+          this.#subnetKeys.delete(ecid.toString());
           const updatedSubnetNodeKeys = await getSubnetNodeKeys();
-          return __privateGet(this, _verifyQueryResponse).call(this, queryWithDetails, updatedSubnetNodeKeys);
+          return this.#verifyQueryResponse(queryWithDetails, updatedSubnetNodeKeys);
         }
       } catch (error) {
         let queryError;
         if (error instanceof AgentError) {
-          if (error.hasCode(IngressExpiryInvalidErrorCode) && !__privateGet(this, _hasSyncedTime)) {
+          if (error.hasCode(IngressExpiryInvalidErrorCode) && !this.#hasSyncedTime) {
             await this.syncTime(ecid);
             return this.query(canisterId, fields, identity);
           }
@@ -10427,9 +10490,16 @@ variant ${k2} -> ${e.message}`);
         throw queryError;
       }
     }
+    /**
+     * See https://internetcomputer.org/docs/current/references/ic-interface-spec/#http-query for details on validation
+     * @param queryResponse - The response from the query
+     * @param subnetNodeKeys - The subnet node keys
+     * @returns ApiQueryResponse
+     */
+    #verifyQueryResponse;
     async createReadStateRequest(fields, identity) {
-      await __privateMethod(this, _HttpAgent_instances, asyncGuard_fn).call(this);
-      const id = await (identity != null ? identity : __privateGet(this, _identity));
+      await this.#asyncGuard();
+      const id = await (identity ?? this.#identity);
       if (!id) {
         throw ExternalError.fromCode(new IdentityInvalidErrorCode());
       }
@@ -10439,7 +10509,7 @@ variant ${k2} -> ${e.message}`);
           method: "POST",
           headers: {
             "Content-Type": "application/cbor",
-            ...__privateGet(this, _credentials) ? { Authorization: "Basic " + btoa(__privateGet(this, _credentials)) } : {}
+            ...this.#credentials ? { Authorization: "Basic " + btoa(this.#credentials) } : {}
           }
         },
         endpoint: Endpoint.ReadState,
@@ -10447,13 +10517,13 @@ variant ${k2} -> ${e.message}`);
           request_type: ReadRequestType.ReadState,
           paths: fields.paths,
           sender,
-          ingress_expiry: calculateIngressExpiry(__privateGet(this, _maxIngressExpiryInMinutes), __privateGet(this, _timeDiffMsecs))
+          ingress_expiry: calculateIngressExpiry(this.#maxIngressExpiryInMinutes, this.#timeDiffMsecs)
         }
       });
       return id.transformRequest(transformedRequest);
     }
-    async readState(canisterId, fields, _identity2, request3) {
-      await __privateMethod(this, _HttpAgent_instances, rootKeyGuard_fn).call(this);
+    async readState(canisterId, fields, _identity, request3) {
+      await this.#rootKeyGuard();
       const canister = Principal.from(canisterId);
       function getRequestId(options) {
         for (const path of options.paths) {
@@ -10470,14 +10540,14 @@ variant ${k2} -> ${e.message}`);
         transformedRequest = request3;
       } else {
         requestId = getRequestId(fields);
-        const identity = await __privateGet(this, _identity);
+        const identity = await this.#identity;
         if (!identity) {
           throw ExternalError.fromCode(new IdentityInvalidErrorCode());
         }
         transformedRequest = await this.createReadStateRequest(fields, identity);
       }
       const url = new URL(`/api/v2/canister/${canister.toString()}/read_state`, this.host);
-      return await __privateMethod(this, _HttpAgent_instances, readStateInner_fn).call(this, url, { canisterId: canister }, transformedRequest, requestId);
+      return await this.#readStateInner(url, { canisterId: canister }, transformedRequest, requestId);
     }
     /**
      * Reads the state of a subnet from the `/api/v2/subnet/{subnetId}/read_state` endpoint.
@@ -10486,12 +10556,52 @@ variant ${k2} -> ${e.message}`);
      * @returns The response from the read state request.
      */
     async readSubnetState(subnetId, options) {
-      var _a2;
-      await __privateMethod(this, _HttpAgent_instances, rootKeyGuard_fn).call(this);
+      await this.#rootKeyGuard();
       const subnet = Principal.from(subnetId);
       const url = new URL(`/api/v2/subnet/${subnet.toString()}/read_state`, this.host);
-      const transformedRequest = await this.createReadStateRequest(options, (_a2 = __privateGet(this, _identity)) != null ? _a2 : void 0);
-      return await __privateMethod(this, _HttpAgent_instances, readStateInner_fn).call(this, url, { subnetId: subnet }, transformedRequest);
+      const transformedRequest = await this.createReadStateRequest(options, this.#identity ?? void 0);
+      return await this.#readStateInner(url, { subnetId: subnet }, transformedRequest);
+    }
+    async #readStateInner(url, principal, transformedRequest, requestId) {
+      const backoff2 = this.#backoffStrategy();
+      try {
+        const { responseBodyBytes } = await this.#requestAndRetry({
+          requestFn: () => this.#fetch(url, {
+            ...this.#fetchOptions,
+            ...transformedRequest.request,
+            body: encode2(transformedRequest.body)
+          }),
+          backoff: backoff2,
+          tries: 0
+        });
+        const decodedResponse = decode2(responseBodyBytes);
+        return decodedResponse;
+      } catch (error) {
+        let readStateError;
+        if (error instanceof AgentError) {
+          if (error.hasCode(IngressExpiryInvalidErrorCode) && !this.#hasSyncedTime) {
+            if ("canisterId" in principal) {
+              await this.syncTime(principal.canisterId);
+            } else if ("subnetId" in principal) {
+              await this.syncTimeWithSubnet(principal.subnetId);
+            } else {
+              throw UNREACHABLE_ERROR;
+            }
+            return await this.#readStateInner(url, principal, transformedRequest, requestId);
+          }
+          error.code.requestContext = {
+            requestId: requestId ?? requestIdOf(transformedRequest),
+            senderPubKey: transformedRequest.body.sender_pubkey,
+            senderSignature: transformedRequest.body.sender_sig,
+            ingressExpiry: transformedRequest.body.content.ingress_expiry
+          };
+          readStateError = error;
+        } else {
+          readStateError = UnknownError.fromCode(new UnexpectedErrorCode(error));
+        }
+        this.log.error(`Error while making read state: ${readStateError.message}`, readStateError);
+        throw readStateError;
+      }
     }
     parseTimeFromResponse(response) {
       let tree;
@@ -10523,22 +10633,20 @@ variant ${k2} -> ${e.message}`);
      * @param {Principal} canisterIdOverride - Pass a canister ID if you need to sync the time with a particular subnet. Uses the ICP ledger canister by default.
      */
     async syncTime(canisterIdOverride) {
-      var _a2;
-      __privateSet(this, _syncTimePromise, (_a2 = __privateGet(this, _syncTimePromise)) != null ? _a2 : (async () => {
-        var _a3;
-        await __privateMethod(this, _HttpAgent_instances, rootKeyGuard_fn).call(this);
+      this.#syncTimePromise = this.#syncTimePromise ?? (async () => {
+        await this.#rootKeyGuard();
         const callTime = Date.now();
         try {
           if (!canisterIdOverride) {
             this.log.print("Syncing time with the IC. No canisterId provided, so falling back to ryjl3-tyaaa-aaaaa-aaaba-cai");
           }
-          const canisterId = canisterIdOverride != null ? canisterIdOverride : Principal.from("ryjl3-tyaaa-aaaaa-aaaba-cai");
+          const canisterId = canisterIdOverride ?? Principal.from("ryjl3-tyaaa-aaaaa-aaaba-cai");
           const anonymousAgent = _HttpAgent.createSync({
             identity: new AnonymousIdentity(),
             host: this.host.toString(),
-            fetch: __privateGet(this, _fetch),
+            fetch: this.#fetch,
             retryTimes: 0,
-            rootKey: (_a3 = this.rootKey) != null ? _a3 : void 0,
+            rootKey: this.rootKey ?? void 0,
             shouldSyncTime: false
           });
           const replicaTimes = await Promise.all(Array(3).fill(null).map(async () => {
@@ -10554,15 +10662,15 @@ variant ${k2} -> ${e.message}`);
               return date.getTime();
             }
           }, []));
-          __privateMethod(this, _HttpAgent_instances, setTimeDiffMsecs_fn).call(this, callTime, replicaTimes);
+          this.#setTimeDiffMsecs(callTime, replicaTimes);
         } catch (error) {
           const syncTimeError = error instanceof AgentError ? error : UnknownError.fromCode(new UnexpectedErrorCode(error));
           this.log.error("Caught exception while attempting to sync time", syncTimeError);
           throw syncTimeError;
         }
-      })());
-      await __privateGet(this, _syncTimePromise).finally(() => {
-        __privateSet(this, _syncTimePromise, null);
+      })();
+      await this.#syncTimePromise.finally(() => {
+        this.#syncTimePromise = null;
       });
     }
     /**
@@ -10570,16 +10678,15 @@ variant ${k2} -> ${e.message}`);
      * @param {Principal} subnetId - Pass the subnet ID you need to sync the time with.
      */
     async syncTimeWithSubnet(subnetId) {
-      var _a2;
-      await __privateMethod(this, _HttpAgent_instances, rootKeyGuard_fn).call(this);
+      await this.#rootKeyGuard();
       const callTime = Date.now();
       try {
         const anonymousAgent = _HttpAgent.createSync({
           identity: new AnonymousIdentity(),
           host: this.host.toString(),
-          fetch: __privateGet(this, _fetch),
+          fetch: this.#fetch,
           retryTimes: 0,
-          rootKey: (_a2 = this.rootKey) != null ? _a2 : void 0,
+          rootKey: this.rootKey ?? void 0,
           shouldSyncTime: false
         });
         const replicaTimes = await Promise.all(Array(3).fill(null).map(async () => {
@@ -10595,47 +10702,76 @@ variant ${k2} -> ${e.message}`);
             return date.getTime();
           }
         }, []));
-        __privateMethod(this, _HttpAgent_instances, setTimeDiffMsecs_fn).call(this, callTime, replicaTimes);
+        this.#setTimeDiffMsecs(callTime, replicaTimes);
       } catch (error) {
         const syncTimeError = error instanceof AgentError ? error : UnknownError.fromCode(new UnexpectedErrorCode(error));
         this.log.error("Caught exception while attempting to sync time with subnet", syncTimeError);
         throw syncTimeError;
       }
     }
+    #setTimeDiffMsecs(callTime, replicaTimes) {
+      const maxReplicaTime = replicaTimes.reduce((max, current) => {
+        return typeof current === "number" && current > max ? current : max;
+      }, 0);
+      if (maxReplicaTime > 0) {
+        this.#timeDiffMsecs = maxReplicaTime - callTime;
+        this.#hasSyncedTime = true;
+        this.log.notify({
+          message: `Syncing time: offset of ${this.#timeDiffMsecs}`,
+          level: "info"
+        });
+      }
+    }
     async status() {
-      const headers = __privateGet(this, _credentials) ? {
-        Authorization: "Basic " + btoa(__privateGet(this, _credentials))
+      const headers = this.#credentials ? {
+        Authorization: "Basic " + btoa(this.#credentials)
       } : {};
       const url = new URL(`/api/v2/status`, this.host);
       this.log.print(`fetching "${url.pathname}"`);
-      const backoff2 = __privateGet(this, _backoffStrategy).call(this);
-      const { responseBodyBytes } = await __privateMethod(this, _HttpAgent_instances, requestAndRetry_fn).call(this, {
+      const backoff2 = this.#backoffStrategy();
+      const { responseBodyBytes } = await this.#requestAndRetry({
         backoff: backoff2,
-        requestFn: () => __privateGet(this, _fetch).call(this, url, { headers, ...__privateGet(this, _fetchOptions) }),
+        requestFn: () => this.#fetch(url, { headers, ...this.#fetchOptions }),
         tries: 0
       });
       return decode2(responseBodyBytes);
     }
     async fetchRootKey() {
-      var _a2;
-      __privateSet(this, _rootKeyPromise, (_a2 = __privateGet(this, _rootKeyPromise)) != null ? _a2 : (async () => {
+      this.#rootKeyPromise = this.#rootKeyPromise ?? (async () => {
         const value = await this.status();
         this.rootKey = value.root_key;
         return this.rootKey;
-      })());
-      return await __privateGet(this, _rootKeyPromise).finally(() => {
-        __privateSet(this, _rootKeyPromise, null);
+      })();
+      return await this.#rootKeyPromise.finally(() => {
+        this.#rootKeyPromise = null;
       });
     }
+    async #asyncGuard(canisterIdOverride) {
+      await Promise.all([this.#rootKeyGuard(), this.#syncTimeGuard(canisterIdOverride)]);
+    }
+    async #rootKeyGuard() {
+      if (this.rootKey) {
+        return;
+      } else if (this.rootKey === null && this.host.toString() !== "https://icp-api.io" && this.#shouldFetchRootKey) {
+        await this.fetchRootKey();
+      } else {
+        throw ExternalError.fromCode(new MissingRootKeyErrorCode(this.#shouldFetchRootKey));
+      }
+    }
+    async #syncTimeGuard(canisterIdOverride) {
+      if (this.#shouldSyncTime && !this.hasSyncedTime()) {
+        await this.syncTime(canisterIdOverride);
+      }
+    }
     invalidateIdentity() {
-      __privateSet(this, _identity, null);
+      this.#identity = null;
     }
     replaceIdentity(identity) {
-      __privateSet(this, _identity, Promise.resolve(identity));
+      this.#identity = Promise.resolve(identity);
     }
     async fetchSubnetKeys(canisterId) {
       const effectiveCanisterId = Principal.from(canisterId);
-      await __privateMethod(this, _HttpAgent_instances, asyncGuard_fn).call(this, effectiveCanisterId);
+      await this.#asyncGuard(effectiveCanisterId);
       const rootKey = this.rootKey;
       const canisterReadState = await this.readState(effectiveCanisterId, {
         paths: [[utf8ToBytes("subnet")]]
@@ -10659,7 +10795,7 @@ variant ${k2} -> ${e.message}`);
       }
       const subnetId = getSubnetIdFromCertificate(canisterCertificate.cert, rootKey);
       const nodeKeys = lookupNodeKeysFromCertificate(canisterCertificate.cert, subnetId);
-      __privateGet(this, _subnetKeys).set(effectiveCanisterId.toText(), nodeKeys);
+      this.#subnetKeys.set(effectiveCanisterId.toText(), nodeKeys);
       return nodeKeys;
     }
     /**
@@ -10670,7 +10806,7 @@ variant ${k2} -> ${e.message}`);
      */
     async getSubnetIdFromCanister(canisterId) {
       const effectiveCanisterId = Principal.from(canisterId);
-      await __privateMethod(this, _HttpAgent_instances, asyncGuard_fn).call(this, effectiveCanisterId);
+      await this.#asyncGuard(effectiveCanisterId);
       const canisterReadState = await this.readState(effectiveCanisterId, {
         paths: [[utf8ToBytes("time")]]
       });
@@ -10685,11 +10821,11 @@ variant ${k2} -> ${e.message}`);
     _transform(request3) {
       let p2 = Promise.resolve(request3);
       if (request3.endpoint === Endpoint.Call) {
-        for (const fn of __privateGet(this, _updatePipeline)) {
+        for (const fn of this.#updatePipeline) {
           p2 = p2.then((r2) => fn(r2).then((r22) => r22 || r2));
         }
       } else {
-        for (const fn of __privateGet(this, _queryPipeline)) {
+        for (const fn of this.#queryPipeline) {
           p2 = p2.then((r2) => fn(r2).then((r22) => r22 || r2));
         }
       }
@@ -10702,235 +10838,15 @@ variant ${k2} -> ${e.message}`);
      * If the time has not been synced, returns `0`.
      */
     getTimeDiffMsecs() {
-      return __privateGet(this, _timeDiffMsecs);
+      return this.#timeDiffMsecs;
     }
     /**
      * Returns `true` if the time has been synced at least once with the IC network, `false` otherwise.
      */
     hasSyncedTime() {
-      return __privateGet(this, _hasSyncedTime);
+      return this.#hasSyncedTime;
     }
   };
-  _rootKeyPromise = new WeakMap();
-  _shouldFetchRootKey = new WeakMap();
-  _timeDiffMsecs = new WeakMap();
-  _hasSyncedTime = new WeakMap();
-  _syncTimePromise = new WeakMap();
-  _shouldSyncTime = new WeakMap();
-  _identity = new WeakMap();
-  _fetch = new WeakMap();
-  _fetchOptions = new WeakMap();
-  _callOptions = new WeakMap();
-  _credentials = new WeakMap();
-  _retryTimes = new WeakMap();
-  _backoffStrategy = new WeakMap();
-  _maxIngressExpiryInMinutes = new WeakMap();
-  _HttpAgent_instances = new WeakSet();
-  maxIngressExpiryInMs_get = function() {
-    return __privateGet(this, _maxIngressExpiryInMinutes) * MINUTE_TO_MSECS;
-  };
-  _queryPipeline = new WeakMap();
-  _updatePipeline = new WeakMap();
-  _subnetKeys = new WeakMap();
-  _verifyQuerySignatures = new WeakMap();
-  requestAndRetryQuery_fn = async function(args) {
-    var _a2, _b2;
-    const { ecid, transformedRequest, body, requestId, backoff: backoff2, tries } = args;
-    const delay = tries === 0 ? 0 : backoff2.next();
-    const url = new URL(`/api/v2/canister/${ecid.toString()}/query`, this.host);
-    this.log.print(`fetching "${url.pathname}" with tries:`, {
-      tries,
-      backoff: backoff2,
-      delay
-    });
-    if (delay === null) {
-      throw UnknownError.fromCode(new TimeoutWaitingForResponseErrorCode(`Backoff strategy exhausted after ${tries} attempts.`, requestId));
-    }
-    if (delay > 0) {
-      await new Promise((resolve) => setTimeout(resolve, delay));
-    }
-    let fetchResponse;
-    try {
-      this.log.print(`fetching "${url.pathname}" with request:`, transformedRequest);
-      fetchResponse = await __privateGet(this, _fetch).call(this, url, {
-        ...__privateGet(this, _fetchOptions),
-        ...transformedRequest.request,
-        body
-      });
-    } catch (error) {
-      if (tries < __privateGet(this, _retryTimes)) {
-        this.log.warn(`Caught exception while attempting to make query:
-  ${error}
-  Retrying query.`);
-        return await __privateMethod(this, _HttpAgent_instances, requestAndRetryQuery_fn).call(this, { ...args, tries: tries + 1 });
-      }
-      throw TransportError.fromCode(new HttpFetchErrorCode(error));
-    }
-    const headers = httpHeadersTransform(fetchResponse.headers);
-    if (fetchResponse.status !== HTTP_STATUS_OK) {
-      const responseText = await fetchResponse.text();
-      if (isIngressExpiryInvalidResponse(responseText)) {
-        throw InputError.fromCode(new IngressExpiryInvalidErrorCode(responseText, __privateGet(this, _maxIngressExpiryInMinutes)));
-      }
-      if (tries < __privateGet(this, _retryTimes)) {
-        return await __privateMethod(this, _HttpAgent_instances, requestAndRetryQuery_fn).call(this, { ...args, tries: tries + 1 });
-      }
-      throw ProtocolError.fromCode(new HttpErrorCode(fetchResponse.status, fetchResponse.statusText, headers, responseText));
-    }
-    const queryResponse = decode2(uint8FromBufLike2(await fetchResponse.arrayBuffer()));
-    const response = {
-      ...queryResponse,
-      httpDetails: {
-        ok: fetchResponse.ok,
-        status: fetchResponse.status,
-        statusText: fetchResponse.statusText,
-        headers
-      },
-      requestId
-    };
-    if (!__privateGet(this, _verifyQuerySignatures)) {
-      return response;
-    }
-    const signatureTimestampNs = (_b2 = (_a2 = response.signatures) == null ? void 0 : _a2[0]) == null ? void 0 : _b2.timestamp;
-    if (!signatureTimestampNs) {
-      throw ProtocolError.fromCode(new MalformedSignatureErrorCode("Timestamp not found in query response. This suggests a malformed or malicious response."));
-    }
-    const signatureTimestampMs = Number(BigInt(signatureTimestampNs) / BigInt(MSECS_TO_NANOSECONDS));
-    const currentTimestampInMs = Date.now() + __privateGet(this, _timeDiffMsecs);
-    if (currentTimestampInMs - signatureTimestampMs > __privateGet(this, _HttpAgent_instances, maxIngressExpiryInMs_get)) {
-      if (tries < __privateGet(this, _retryTimes)) {
-        this.log.warn("Timestamp is older than the max ingress expiry. Retrying query.", {
-          requestId,
-          signatureTimestampMs
-        });
-        await this.syncTime(ecid);
-        return await __privateMethod(this, _HttpAgent_instances, requestAndRetryQuery_fn).call(this, { ...args, tries: tries + 1 });
-      }
-      throw TrustError.fromCode(new CertificateOutdatedErrorCode(__privateGet(this, _maxIngressExpiryInMinutes), requestId, tries));
-    }
-    return response;
-  };
-  requestAndRetry_fn = async function(args) {
-    const { requestFn, backoff: backoff2, tries } = args;
-    const delay = tries === 0 ? 0 : backoff2.next();
-    if (delay === null) {
-      throw ProtocolError.fromCode(new TimeoutWaitingForResponseErrorCode(`Retry strategy exhausted after ${tries} attempts.`));
-    }
-    if (delay > 0) {
-      await new Promise((resolve) => setTimeout(resolve, delay));
-    }
-    let response;
-    let responseBodyBytes = new Uint8Array();
-    try {
-      response = await requestFn();
-      if (response.status === HTTP_STATUS_OK) {
-        responseBodyBytes = uint8FromBufLike2(await response.clone().arrayBuffer());
-      }
-    } catch (error) {
-      if (tries < __privateGet(this, _retryTimes)) {
-        this.log.warn(`Caught exception while attempting to make request:
-  ${error}
-  Retrying request.`);
-        return await __privateMethod(this, _HttpAgent_instances, requestAndRetry_fn).call(this, { requestFn, backoff: backoff2, tries: tries + 1 });
-      }
-      throw TransportError.fromCode(new HttpFetchErrorCode(error));
-    }
-    const headers = httpHeadersTransform(response.headers);
-    if (response.status === HTTP_STATUS_OK || response.status === HTTP_STATUS_ACCEPTED) {
-      return {
-        ok: response.ok,
-        // should always be true
-        status: response.status,
-        statusText: response.statusText,
-        responseBodyBytes,
-        headers
-      };
-    }
-    const responseText = await response.text();
-    if (response.status === HTTP_STATUS_NOT_FOUND && response.url.includes("api/v4")) {
-      throw ProtocolError.fromCode(new HttpV4ApiNotSupportedErrorCode());
-    }
-    if (isIngressExpiryInvalidResponse(responseText)) {
-      throw InputError.fromCode(new IngressExpiryInvalidErrorCode(responseText, __privateGet(this, _maxIngressExpiryInMinutes)));
-    }
-    if (tries < __privateGet(this, _retryTimes)) {
-      return await __privateMethod(this, _HttpAgent_instances, requestAndRetry_fn).call(this, { requestFn, backoff: backoff2, tries: tries + 1 });
-    }
-    throw ProtocolError.fromCode(new HttpErrorCode(response.status, response.statusText, headers, responseText));
-  };
-  _verifyQueryResponse = new WeakMap();
-  readStateInner_fn = async function(url, principal, transformedRequest, requestId) {
-    const backoff2 = __privateGet(this, _backoffStrategy).call(this);
-    try {
-      const { responseBodyBytes } = await __privateMethod(this, _HttpAgent_instances, requestAndRetry_fn).call(this, {
-        requestFn: () => __privateGet(this, _fetch).call(this, url, {
-          ...__privateGet(this, _fetchOptions),
-          ...transformedRequest.request,
-          body: encode2(transformedRequest.body)
-        }),
-        backoff: backoff2,
-        tries: 0
-      });
-      const decodedResponse = decode2(responseBodyBytes);
-      return decodedResponse;
-    } catch (error) {
-      let readStateError;
-      if (error instanceof AgentError) {
-        if (error.hasCode(IngressExpiryInvalidErrorCode) && !__privateGet(this, _hasSyncedTime)) {
-          if ("canisterId" in principal) {
-            await this.syncTime(principal.canisterId);
-          } else if ("subnetId" in principal) {
-            await this.syncTimeWithSubnet(principal.subnetId);
-          } else {
-            throw UNREACHABLE_ERROR;
-          }
-          return await __privateMethod(this, _HttpAgent_instances, readStateInner_fn).call(this, url, principal, transformedRequest, requestId);
-        }
-        error.code.requestContext = {
-          requestId: requestId != null ? requestId : requestIdOf(transformedRequest),
-          senderPubKey: transformedRequest.body.sender_pubkey,
-          senderSignature: transformedRequest.body.sender_sig,
-          ingressExpiry: transformedRequest.body.content.ingress_expiry
-        };
-        readStateError = error;
-      } else {
-        readStateError = UnknownError.fromCode(new UnexpectedErrorCode(error));
-      }
-      this.log.error(`Error while making read state: ${readStateError.message}`, readStateError);
-      throw readStateError;
-    }
-  };
-  setTimeDiffMsecs_fn = function(callTime, replicaTimes) {
-    const maxReplicaTime = replicaTimes.reduce((max, current) => {
-      return typeof current === "number" && current > max ? current : max;
-    }, 0);
-    if (maxReplicaTime > 0) {
-      __privateSet(this, _timeDiffMsecs, maxReplicaTime - callTime);
-      __privateSet(this, _hasSyncedTime, true);
-      this.log.notify({
-        message: `Syncing time: offset of ${__privateGet(this, _timeDiffMsecs)}`,
-        level: "info"
-      });
-    }
-  };
-  asyncGuard_fn = async function(canisterIdOverride) {
-    await Promise.all([__privateMethod(this, _HttpAgent_instances, rootKeyGuard_fn).call(this), __privateMethod(this, _HttpAgent_instances, syncTimeGuard_fn).call(this, canisterIdOverride)]);
-  };
-  rootKeyGuard_fn = async function() {
-    if (this.rootKey) {
-      return;
-    } else if (this.rootKey === null && this.host.toString() !== "https://icp-api.io" && __privateGet(this, _shouldFetchRootKey)) {
-      await this.fetchRootKey();
-    } else {
-      throw ExternalError.fromCode(new MissingRootKeyErrorCode(__privateGet(this, _shouldFetchRootKey)));
-    }
-  };
-  syncTimeGuard_fn = async function(canisterIdOverride) {
-    if (__privateGet(this, _shouldSyncTime) && !this.hasSyncedTime()) {
-      await this.syncTime(canisterIdOverride);
-    }
-  };
-  var HttpAgent = _HttpAgent;
   function calculateIngressExpiry(maxIngressExpiryInMinutes, timeDiffMsecs) {
     const ingressExpiryMs = maxIngressExpiryInMinutes * MINUTE_TO_MSECS;
     return Expiry.fromDeltaInMilliseconds(ingressExpiryMs, timeDiffMsecs);
@@ -11001,11 +10917,10 @@ variant ${k2} -> ${e.message}`);
     return isObjectWithProperty(value, "body") && isObjectWithProperty(value.body, "content") && value.body.content.request_type === ReadRequestType.ReadState && isObjectWithProperty(value.body.content, "ingress_expiry") && typeof value.body.content.ingress_expiry === "object" && value.body.content.ingress_expiry !== null && hasFunction(value.body.content.ingress_expiry, "toHash");
   }
   async function pollForResponse(agent, canisterId, requestId, options = {}) {
-    var _a2, _b2;
     const path = [utf8ToBytes("request_status"), requestId];
     let state;
     let currentRequest;
-    const preSignReadStateRequest = (_a2 = options.preSignReadStateRequest) != null ? _a2 : false;
+    const preSignReadStateRequest = options.preSignReadStateRequest ?? false;
     if (preSignReadStateRequest) {
       currentRequest = await constructRequest({
         paths: [path],
@@ -11043,7 +10958,7 @@ variant ${k2} -> ${e.message}`);
       case RequestStatusResponseStatus.Received:
       case RequestStatusResponseStatus.Unknown:
       case RequestStatusResponseStatus.Processing: {
-        const strategy = (_b2 = options.strategy) != null ? _b2 : defaultStrategy();
+        const strategy = options.strategy ?? defaultStrategy();
         await strategy(canisterId, requestId, status);
         return pollForResponse(agent, canisterId, requestId, {
           ...options,
@@ -11065,14 +10980,13 @@ variant ${k2} -> ${e.message}`);
     throw UNREACHABLE_ERROR;
   }
   async function constructRequest(options) {
-    var _a2;
     const { paths, agent, pollingOptions } = options;
     if (pollingOptions.request && isSignedReadStateRequestWithExpiry(pollingOptions.request)) {
       return pollingOptions.request;
     }
-    const request3 = await ((_a2 = agent.createReadStateRequest) == null ? void 0 : _a2.call(agent, {
+    const request3 = await agent.createReadStateRequest?.({
       paths
-    }, void 0));
+    }, void 0);
     if (!isSignedReadStateRequestWithExpiry(request3)) {
       throw InputError.fromCode(new InvalidReadStateRequestErrorCode(request3));
     }
@@ -11080,7 +10994,7 @@ variant ${k2} -> ${e.message}`);
   }
 
   // node_modules/@icp-sdk/core/lib/esm/agent/actor.js
-  var metadataSymbol = /* @__PURE__ */ Symbol.for("ic-agent-metadata");
+  var metadataSymbol = Symbol.for("ic-agent-metadata");
   var Actor = class _Actor {
     /**
      * Get the Agent class this Actor would call, or undefined if the Actor would use
@@ -11117,10 +11031,10 @@ variant ${k2} -> ${e.message}`);
             service
           });
           for (const [methodName, func] of service._fields) {
-            if (options == null ? void 0 : options.httpDetails) {
+            if (options?.httpDetails) {
               func.annotations.push(ACTOR_METHOD_WITH_HTTP_DETAILS);
             }
-            if (options == null ? void 0 : options.certificate) {
+            if (options?.certificate) {
               func.annotations.push(ACTOR_METHOD_WITH_CERTIFICATE);
             }
             this[methodName] = _createActorMethod(this, methodName, func, config.blsVerify);
@@ -11234,10 +11148,9 @@ variant ${k2} -> ${e.message}`);
     let caller;
     if (func.annotations.includes("query") || func.annotations.includes("composite_query")) {
       caller = async (options, ...args) => {
-        var _a2, _b2;
         options = {
           ...options,
-          ...(_b2 = (_a2 = actor[metadataSymbol].config).queryTransform) == null ? void 0 : _b2.call(_a2, methodName, args, {
+          ...actor[metadataSymbol].config.queryTransform?.(methodName, args, {
             ...actor[metadataSymbol].config,
             ...options
           })
@@ -11273,10 +11186,9 @@ variant ${k2} -> ${e.message}`);
       };
     } else {
       caller = async (options, ...args) => {
-        var _a2, _b2;
         options = {
           ...options,
-          ...(_b2 = (_a2 = actor[metadataSymbol].config).callTransform) == null ? void 0 : _b2.call(_a2, methodName, args, {
+          ...actor[metadataSymbol].config.callTransform?.(methodName, args, {
             ...actor[metadataSymbol].config,
             ...options
           })
@@ -11386,11 +11298,8 @@ variant ${k2} -> ${e.message}`);
     handler.withOptions = (options) => (...args) => caller(options, ...args);
     return handler;
   }
-  return __toCommonJS(bundle_entry_exports);
+  return __toCommonJS(icp_sdk_agent_entry_exports);
 })();
-
-// Ensure global availability when loaded via ESM/CommonJS bundlers.
-globalThis.DfinityAgent = DfinityAgent;
 /*! Bundled license information:
 
 @noble/hashes/esm/utils.js:
@@ -11407,3 +11316,9 @@ globalThis.DfinityAgent = DfinityAgent;
 @noble/curves/esm/ed25519.js:
   (*! noble-curves - MIT License (c) 2022 Paul Miller (paulmillr.com) *)
 */
+
+
+// Ensure global availability when loaded via ESM/CommonJS bundlers.
+;globalThis.DfinityAgent = DfinityAgent;
+
+//# sourceMappingURL=icp-sdk-agent.js.map

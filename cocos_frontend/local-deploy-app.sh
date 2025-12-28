@@ -5,8 +5,9 @@ set -e
 echo "Building Cocos Creator project..."
 
 set +e
-/Applications/Cocos/Creator/3.8.8/CocosCreator.app/Contents/MacOS/CocosCreator --project "$(pwd)/cocos_frontend" --build "configPath=$(pwd)/cocos_frontend/buildConfig_web-mobile.json"
-EXIT_CODE=$?
+/Applications/Cocos/Creator/3.8.8/CocosCreator.app/Contents/MacOS/CocosCreator --project "./" --build "configPath=buildConfig_web-mobile.json"
+EXIT_C
+ODE=$?
 set -e
 
 if [ $EXIT_CODE -ne 0 ] && [ $EXIT_CODE -ne 36 ]; then

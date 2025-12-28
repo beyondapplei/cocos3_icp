@@ -128,8 +128,4 @@ if (typeof g.Buffer === 'undefined') {
 	g.Buffer = BufferShimAny;
 }
 
-// Load ICP SDK bundles (IIFE/UMD). They expose globals on `window`.
-import '../lib3/icp-sdk-agent.js';
-import '../lib3/icp-sdk-auth-client.js';
-
 export {};

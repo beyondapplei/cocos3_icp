@@ -3,10 +3,6 @@ var DfinityAuthClient = (() => {
   var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
   var __getOwnPropNames = Object.getOwnPropertyNames;
   var __hasOwnProp = Object.prototype.hasOwnProperty;
-  var __typeError = (msg) => {
-    throw TypeError(msg);
-  };
-  var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
   var __export = (target, all) => {
     for (var name in all)
       __defProp(target, name, { get: all[name], enumerable: true });
@@ -20,15 +16,10 @@ var DfinityAuthClient = (() => {
     return to;
   };
   var __toCommonJS = (mod2) => __copyProps(__defProp({}, "__esModule", { value: true }), mod2);
-  var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
-  var __accessCheck = (obj, member, msg) => member.has(obj) || __typeError("Cannot " + msg);
-  var __privateGet = (obj, member, getter) => (__accessCheck(obj, member, "read from private field"), getter ? getter.call(obj) : member.get(obj));
-  var __privateAdd = (obj, member, value) => member.has(obj) ? __typeError("Cannot add the same private member more than once") : member instanceof WeakSet ? member.add(obj) : member.set(obj, value);
-  var __privateSet = (obj, member, value, setter) => (__accessCheck(obj, member, "write to private field"), setter ? setter.call(obj, value) : member.set(obj, value), value);
 
-  // assets/Script/Lib/bundle_auth_entry.js
-  var bundle_auth_entry_exports = {};
-  __export(bundle_auth_entry_exports, {
+  // tools/entries/icp-sdk-auth-client-entry.js
+  var icp_sdk_auth_client_entry_exports = {};
+  __export(icp_sdk_auth_client_entry_exports, {
     AuthClient: () => AuthClient,
     LocalStorage: () => LocalStorage
   });
@@ -1313,7 +1304,7 @@ Call context:
      * @param buffer an optional buffer to start with
      * @param length an optional amount of bytes to use for the length.
      */
-    constructor(buffer, length = (buffer == null ? void 0 : buffer.byteLength) || 0) {
+    constructor(buffer, length = buffer?.byteLength || 0) {
       if (buffer && !(buffer instanceof Uint8Array)) {
         try {
           buffer = uint8FromBufLike(buffer);
@@ -1590,7 +1581,7 @@ Call context:
   }
   function _abytes2(value, length, title = "") {
     const bytes = isBytes(value);
-    const len = value == null ? void 0 : value.length;
+    const len = value?.length;
     const needsLen = length !== void 0;
     if (!bytes || needsLen && len !== length) {
       const prefix = title && `"${title}" `;
@@ -3198,18 +3189,7 @@ Call context:
   function isObject(value) {
     return value !== null && typeof value === "object";
   }
-  var _rawKey, _derKey;
-  var _Ed25519PublicKey = class _Ed25519PublicKey {
-    // `fromRaw` and `fromDer` should be used for instantiation, not this constructor.
-    constructor(key) {
-      __privateAdd(this, _rawKey);
-      __privateAdd(this, _derKey);
-      if (key.byteLength !== _Ed25519PublicKey.RAW_KEY_LENGTH) {
-        throw new Error("An Ed25519 public key must be exactly 32bytes long");
-      }
-      __privateSet(this, _rawKey, key);
-      __privateSet(this, _derKey, _Ed25519PublicKey.derEncode(key));
-    }
+  var Ed25519PublicKey = class _Ed25519PublicKey {
     /**
      * Construct Ed25519PublicKey from an existing PublicKey
      * @param {unknown} maybeKey - existing PublicKey, ArrayBuffer, DerEncodedPublicKey, or hex string
@@ -3244,6 +3224,9 @@ Call context:
     static fromDer(derKey) {
       return new _Ed25519PublicKey(this.derDecode(derKey));
     }
+    static {
+      this.RAW_KEY_LENGTH = 32;
+    }
     static derEncode(publicKey) {
       const key = wrapDER(publicKey, ED25519_OID);
       key.__derEncodedPublicKey__ = void 0;
@@ -3256,11 +3239,21 @@ Call context:
       }
       return unwrapped;
     }
+    #rawKey;
     get rawKey() {
-      return __privateGet(this, _rawKey);
+      return this.#rawKey;
     }
+    #derKey;
     get derKey() {
-      return __privateGet(this, _derKey);
+      return this.#derKey;
+    }
+    // `fromRaw` and `fromDer` should be used for instantiation, not this constructor.
+    constructor(key) {
+      if (key.byteLength !== _Ed25519PublicKey.RAW_KEY_LENGTH) {
+        throw new Error("An Ed25519 public key must be exactly 32bytes long");
+      }
+      this.#rawKey = key;
+      this.#derKey = _Ed25519PublicKey.derEncode(key);
     }
     toDer() {
       return this.derKey;
@@ -3269,20 +3262,7 @@ Call context:
       return this.rawKey;
     }
   };
-  _rawKey = new WeakMap();
-  _derKey = new WeakMap();
-  _Ed25519PublicKey.RAW_KEY_LENGTH = 32;
-  var Ed25519PublicKey = _Ed25519PublicKey;
-  var _publicKey, _privateKey;
-  var _Ed25519KeyIdentity = class _Ed25519KeyIdentity extends SignIdentity {
-    // `fromRaw` and `fromDer` should be used for instantiation, not this constructor.
-    constructor(publicKey, privateKey) {
-      super();
-      __privateAdd(this, _publicKey);
-      __privateAdd(this, _privateKey);
-      __privateSet(this, _publicKey, Ed25519PublicKey.from(publicKey));
-      __privateSet(this, _privateKey, privateKey);
-    }
+  var Ed25519KeyIdentity = class _Ed25519KeyIdentity extends SignIdentity {
     /**
      * Generate a new Ed25519KeyIdentity.
      * @param seed a 32-byte seed for the private key. If not provided, a random seed will be generated.
@@ -3326,33 +3306,41 @@ Call context:
       const publicKey = ed25519.getPublicKey(secretKey);
       return _Ed25519KeyIdentity.fromKeyPair(publicKey, secretKey);
     }
+    #publicKey;
+    #privateKey;
+    // `fromRaw` and `fromDer` should be used for instantiation, not this constructor.
+    constructor(publicKey, privateKey) {
+      super();
+      this.#publicKey = Ed25519PublicKey.from(publicKey);
+      this.#privateKey = privateKey;
+    }
     /**
      * Serialize this key to JSON.
      */
     toJSON() {
-      return [bytesToHex(__privateGet(this, _publicKey).toDer()), bytesToHex(__privateGet(this, _privateKey))];
+      return [bytesToHex(this.#publicKey.toDer()), bytesToHex(this.#privateKey)];
     }
     /**
      * Return a copy of the key pair.
      */
     getKeyPair() {
       return {
-        secretKey: __privateGet(this, _privateKey),
-        publicKey: __privateGet(this, _publicKey)
+        secretKey: this.#privateKey,
+        publicKey: this.#publicKey
       };
     }
     /**
      * Return the public key.
      */
     getPublicKey() {
-      return __privateGet(this, _publicKey);
+      return this.#publicKey;
     }
     /**
      * Signs a blob of data, with this identity's private key.
      * @param challenge - challenge to sign with this identity's secretKey, producing a signature
      */
     async sign(challenge) {
-      const signature = ed25519.sign(challenge, __privateGet(this, _privateKey).slice(0, 32));
+      const signature = ed25519.sign(challenge, this.#privateKey.slice(0, 32));
       Object.defineProperty(signature, "__signature__", {
         enumerable: false,
         value: void 0
@@ -3376,9 +3364,6 @@ Call context:
       return ed25519.verify(signature, message, publicKey);
     }
   };
-  _publicKey = new WeakMap();
-  _privateKey = new WeakMap();
-  var Ed25519KeyIdentity = _Ed25519KeyIdentity;
 
   // node_modules/@icp-sdk/core/lib/esm/identity/identity/ecdsa.js
   var CryptoError = class _CryptoError extends Error {
@@ -3410,7 +3395,7 @@ Call context:
      * @returns a {@link ECDSAKeyIdentity}
      */
     static async generate(options) {
-      const { extractable = false, keyUsages = ["sign", "verify"], subtleCrypto } = options != null ? options : {};
+      const { extractable = false, keyUsages = ["sign", "verify"], subtleCrypto } = options ?? {};
       const effectiveCrypto = _getEffectiveCrypto(subtleCrypto);
       const keyPair = await effectiveCrypto.generateKey({
         name: "ECDSA",
@@ -3481,44 +3466,40 @@ Call context:
   };
 
   // node_modules/@icp-sdk/core/lib/esm/identity/identity/partial.js
-  var _inner;
   var PartialIdentity = class {
-    constructor(inner) {
-      __privateAdd(this, _inner);
-      __privateSet(this, _inner, inner);
-    }
+    #inner;
     /**
      * The raw public key of this identity.
      */
     get rawKey() {
-      return __privateGet(this, _inner).rawKey;
+      return this.#inner.rawKey;
     }
     /**
      * The DER-encoded public key of this identity.
      */
     get derKey() {
-      return __privateGet(this, _inner).derKey;
+      return this.#inner.derKey;
     }
     /**
      * The DER-encoded public key of this identity.
      */
     toDer() {
-      return __privateGet(this, _inner).toDer();
+      return this.#inner.toDer();
     }
     /**
      * The inner {@link PublicKey} used by this identity.
      */
     getPublicKey() {
-      return __privateGet(this, _inner);
+      return this.#inner;
     }
     /**
      * The {@link Principal} of this identity.
      */
     getPrincipal() {
-      if (!__privateGet(this, _inner).rawKey) {
+      if (!this.#inner.rawKey) {
         throw new Error("Cannot get principal from a public key without a raw key.");
       }
-      return Principal.fromUint8Array(new Uint8Array(__privateGet(this, _inner).rawKey));
+      return Principal.fromUint8Array(new Uint8Array(this.#inner.rawKey));
     }
     /**
      * Required for the Identity interface, but cannot implemented for just a public key.
@@ -3526,8 +3507,10 @@ Call context:
     transformRequest() {
       return Promise.reject("Not implemented. You are attempting to use a partial identity to sign calls, but this identity only has access to the public key.To sign calls, use a DelegationIdentity instead.");
     }
+    constructor(inner) {
+      this.#inner = inner;
+    }
   };
-  _inner = new WeakMap();
 
   // node_modules/@icp-sdk/core/lib/esm/identity/identity/delegation.js
   function safeBytesToHex(data) {
@@ -3613,9 +3596,8 @@ Call context:
      * @param options.targets - targets that scope the delegation (e.g. Canister Principals)
      */
     static async create(from, to, expiration = new Date(Date.now() + 15 * 60 * 1e3), options = {}) {
-      var _a, _b;
       const delegation = await _createSingleDelegation(from, to, expiration, options.targets);
-      return new _DelegationChain([...((_a = options.previous) == null ? void 0 : _a.delegations) || [], delegation], ((_b = options.previous) == null ? void 0 : _b.publicKey) || from.getPublicKey().toDer());
+      return new _DelegationChain([...options.previous?.delegations || [], delegation], options.previous?.publicKey || from.getPublicKey().toDer());
     }
     /**
      * Creates a DelegationChain object from a JSON string.
@@ -3690,10 +3672,10 @@ Call context:
     static fromDelegation(key, delegation) {
       return new this(key, delegation);
     }
-    constructor(_inner2, _delegation2) {
+    constructor(_inner, _delegation) {
       super();
-      this._inner = _inner2;
-      this._delegation = _delegation2;
+      this._inner = _inner;
+      this._delegation = _delegation;
     }
     getDelegation() {
       return this._delegation;
@@ -3721,18 +3703,17 @@ Call context:
       };
     }
   };
-  var _delegation;
-  var _PartialDelegationIdentity = class _PartialDelegationIdentity extends PartialIdentity {
-    constructor(inner, delegation) {
-      super(inner);
-      __privateAdd(this, _delegation);
-      __privateSet(this, _delegation, delegation);
-    }
+  var PartialDelegationIdentity = class _PartialDelegationIdentity extends PartialIdentity {
+    #delegation;
     /**
      * The Delegation Chain of this identity.
      */
     get delegation() {
-      return __privateGet(this, _delegation);
+      return this.#delegation;
+    }
+    constructor(inner, delegation) {
+      super(inner);
+      this.#delegation = delegation;
     }
     /**
      * Create a {@link PartialDelegationIdentity} from a {@link PublicKey} and a {@link DelegationChain}.
@@ -3743,8 +3724,6 @@ Call context:
       return new _PartialDelegationIdentity(key, delegation);
     }
   };
-  _delegation = new WeakMap();
-  var PartialDelegationIdentity = _PartialDelegationIdentity;
   function isDelegationValid(chain, checks) {
     for (const { delegation } of chain.delegations) {
       if (+new Date(Number(delegation.expiration / BigInt(1e6))) <= +Date.now()) {
@@ -3752,7 +3731,7 @@ Call context:
       }
     }
     const scopes = [];
-    const maybeScope = checks == null ? void 0 : checks.scope;
+    const maybeScope = checks?.scope;
     if (maybeScope) {
       if (Array.isArray(maybeScope)) {
         scopes.push(...maybeScope.map((s) => typeof s === "string" ? Principal.fromText(s) : s));
@@ -3784,15 +3763,26 @@ Call context:
   // node_modules/@icp-sdk/auth/dist/esm/client/idle-manager.js
   var events = ["mousedown", "mousemove", "keydown", "touchstart", "wheel"];
   var IdleManager = class _IdleManager {
+    callbacks = [];
+    idleTimeout = 10 * 60 * 1e3;
+    timeoutID = void 0;
+    /**
+     * Creates an {@link IdleManager}
+     * @param {IdleManagerOptions} options Optional configuration
+     * @see {@link IdleManagerOptions}
+     * @param options.onIdle Callback once user has been idle. Use to prompt for fresh login, and use `Actor.agentOf(your_actor).invalidateIdentity()` to protect the user
+     * @param options.idleTimeout timeout in ms
+     * @param options.captureScroll capture scroll events
+     * @param options.scrollDebounce scroll debounce time in ms
+     */
+    static create(options = {}) {
+      return new _IdleManager(options);
+    }
     /**
      * @protected
      * @param options {@link IdleManagerOptions}
      */
     constructor(options = {}) {
-      __publicField(this, "callbacks", []);
-      __publicField(this, "idleTimeout", 10 * 60 * 1e3);
-      __publicField(this, "timeoutID");
-      var _a;
       const { onIdle, idleTimeout = 10 * 60 * 1e3 } = options || {};
       this.callbacks = onIdle ? [onIdle] : [];
       this.idleTimeout = idleTimeout;
@@ -3813,23 +3803,11 @@ Call context:
           timeout = window.setTimeout(later, wait);
         };
       };
-      if (options == null ? void 0 : options.captureScroll) {
-        const scroll = debounce(_resetTimer, (_a = options == null ? void 0 : options.scrollDebounce) != null ? _a : 100);
+      if (options?.captureScroll) {
+        const scroll = debounce(_resetTimer, options?.scrollDebounce ?? 100);
         window.addEventListener("scroll", scroll, true);
       }
       _resetTimer();
-    }
-    /**
-     * Creates an {@link IdleManager}
-     * @param {IdleManagerOptions} options Optional configuration
-     * @see {@link IdleManagerOptions}
-     * @param options.onIdle Callback once user has been idle. Use to prompt for fresh login, and use `Actor.agentOf(your_actor).invalidateIdentity()` to protect the user
-     * @param options.idleTimeout timeout in ms
-     * @param options.captureScroll capture scroll events
-     * @param options.scrollDebounce scroll debounce time in ms
-     */
-    static create(options = {}) {
-      return new _IdleManager(options);
     }
     /**
      * @param {IdleCB} callback function to be called when user goes idle
@@ -4072,8 +4050,7 @@ Call context:
   var AUTH_DB_NAME = "auth-client-db";
   var OBJECT_STORE_NAME = "ic-keyval";
   var _openDbStore = async (dbName = AUTH_DB_NAME, storeName = OBJECT_STORE_NAME, version) => {
-    var _a;
-    if ((_a = globalThis.localStorage) == null ? void 0 : _a.getItem(KEY_STORAGE_DELEGATION)) {
+    if (globalThis.localStorage?.getItem(KEY_STORAGE_DELEGATION)) {
       globalThis.localStorage.removeItem(KEY_STORAGE_DELEGATION);
       globalThis.localStorage.removeItem(KEY_STORAGE_KEY);
     }
@@ -4114,7 +4091,7 @@ Call context:
         dbName = AUTH_DB_NAME,
         storeName = OBJECT_STORE_NAME,
         version = DB_VERSION
-      } = options != null ? options : {};
+      } = options ?? {};
       const db = await _openDbStore(dbName, storeName, version);
       return new _IdbKeyVal(db, storeName);
     }
@@ -4136,8 +4113,7 @@ Call context:
      * await get<string>('exampleKey') -> 'exampleValue'
      */
     async get(key) {
-      var _a;
-      return (_a = await _getValue(this._db, this._storeName, key)) != null ? _a : null;
+      return await _getValue(this._db, this._storeName, key) ?? null;
     }
     /**
      * Remove a key
@@ -4181,8 +4157,8 @@ Call context:
       return ls;
     }
   };
-  var _options;
   var IdbStorage = class {
+    #options;
     /**
      * @param options - DBCreateOptions
      * @param options.dbName - name for the indexeddb database
@@ -4194,18 +4170,17 @@ Call context:
      * ```
      */
     constructor(options) {
-      __privateAdd(this, _options);
-      // Initializes a KeyVal on first request
-      __publicField(this, "initializedDb");
-      __privateSet(this, _options, options != null ? options : {});
+      this.#options = options ?? {};
     }
+    // Initializes a KeyVal on first request
+    initializedDb;
     get _db() {
       return new Promise((resolve, reject) => {
         if (this.initializedDb) {
           resolve(this.initializedDb);
           return;
         }
-        IdbKeyVal.create(__privateGet(this, _options)).then((db) => {
+        IdbKeyVal.create(this.#options).then((db) => {
           this.initializedDb = db;
           resolve(db);
         }).catch(reject);
@@ -4224,7 +4199,6 @@ Call context:
       await db.remove(key);
     }
   };
-  _options = new WeakMap();
 
   // node_modules/@icp-sdk/auth/dist/esm/client/auth-client.js
   var NANOSECONDS_PER_SECOND = BigInt(1e9);
@@ -4269,9 +4243,8 @@ Call context:
      * })
      */
     static async create(options = {}) {
-      var _a, _b, _c;
-      const storage = (_a = options.storage) != null ? _a : new IdbStorage();
-      const keyType = (_b = options.keyType) != null ? _b : ECDSA_KEY_LABEL;
+      const storage = options.storage ?? new IdbStorage();
+      const keyType = options.keyType ?? ECDSA_KEY_LABEL;
       let key = null;
       if (options.identity) {
         key = options.identity;
@@ -4341,7 +4314,7 @@ Call context:
         }
       }
       let idleManager;
-      if ((_c = options.idleOptions) == null ? void 0 : _c.disableIdle) {
+      if (options.idleOptions?.disableIdle) {
         idleManager = void 0;
       } else if (chain || options.identity) {
         idleManager = IdleManager.create(options.idleOptions);
@@ -4362,17 +4335,15 @@ Call context:
       return new _AuthClient(identity, key, chain, storage, idleManager, options);
     }
     _registerDefaultIdleCallback() {
-      var _a, _b;
-      const idleOptions = (_a = this._createOptions) == null ? void 0 : _a.idleOptions;
-      if (!(idleOptions == null ? void 0 : idleOptions.onIdle) && !(idleOptions == null ? void 0 : idleOptions.disableDefaultIdleCallback)) {
-        (_b = this.idleManager) == null ? void 0 : _b.registerCallback(() => {
+      const idleOptions = this._createOptions?.idleOptions;
+      if (!idleOptions?.onIdle && !idleOptions?.disableDefaultIdleCallback) {
+        this.idleManager?.registerCallback(() => {
           this.logout();
           location.reload();
         });
       }
     }
     async _handleSuccess(message, onSuccess) {
-      var _a, _b;
       const delegations = message.delegations.map((signedDelegation) => {
         return {
           delegation: new Delegation(
@@ -4397,9 +4368,9 @@ Call context:
       } else {
         this._identity = DelegationIdentity.fromDelegation(key, this._chain);
       }
-      (_a = this._idpWindow) == null ? void 0 : _a.close();
-      const idleOptions = (_b = this._createOptions) == null ? void 0 : _b.idleOptions;
-      if (!this.idleManager && !(idleOptions == null ? void 0 : idleOptions.disableIdle)) {
+      this._idpWindow?.close();
+      const idleOptions = this._createOptions?.idleOptions;
+      if (!this.idleManager && !idleOptions?.disableIdle) {
         this.idleManager = IdleManager.create(idleOptions);
         this._registerDefaultIdleCallback();
       }
@@ -4409,7 +4380,7 @@ Call context:
         await this._storage.set(KEY_STORAGE_DELEGATION, JSON.stringify(this._chain.toJSON()));
       }
       await persistKey(this._storage, this._key);
-      onSuccess == null ? void 0 : onSuccess(message);
+      onSuccess?.(message);
     }
     getIdentity() {
       return this._identity;
@@ -4443,29 +4414,28 @@ Call context:
      * });
      */
     async login(options) {
-      var _a, _b, _c, _d, _e;
-      const loginOptions = mergeLoginOptions((_a = this._createOptions) == null ? void 0 : _a.loginOptions, options);
-      const maxTimeToLive = (_b = loginOptions == null ? void 0 : loginOptions.maxTimeToLive) != null ? _b : DEFAULT_MAX_TIME_TO_LIVE;
+      const loginOptions = mergeLoginOptions(this._createOptions?.loginOptions, options);
+      const maxTimeToLive = loginOptions?.maxTimeToLive ?? DEFAULT_MAX_TIME_TO_LIVE;
       const identityProviderUrl = new URL(
-        ((_c = loginOptions == null ? void 0 : loginOptions.identityProvider) == null ? void 0 : _c.toString()) || IDENTITY_PROVIDER_DEFAULT
+        loginOptions?.identityProvider?.toString() || IDENTITY_PROVIDER_DEFAULT
       );
       identityProviderUrl.hash = IDENTITY_PROVIDER_ENDPOINT;
-      (_d = this._idpWindow) == null ? void 0 : _d.close();
+      this._idpWindow?.close();
       this._removeEventListener();
       this._eventHandler = this._getEventHandler(identityProviderUrl, {
         maxTimeToLive,
         ...loginOptions
       });
       window.addEventListener("message", this._eventHandler);
-      this._idpWindow = (_e = window.open(
+      this._idpWindow = window.open(
         identityProviderUrl.toString(),
         "idpWindow",
-        loginOptions == null ? void 0 : loginOptions.windowOpenerFeatures
-      )) != null ? _e : void 0;
+        loginOptions?.windowOpenerFeatures
+      ) ?? void 0;
       const checkInterruption = () => {
         if (this._idpWindow) {
           if (this._idpWindow.closed) {
-            this._handleFailure(ERROR_USER_INTERRUPT, loginOptions == null ? void 0 : loginOptions.onError);
+            this._handleFailure(ERROR_USER_INTERRUPT, loginOptions?.onError);
           } else {
             setTimeout(checkInterruption, INTERRUPT_CHECK_INTERVAL);
           }
@@ -4475,7 +4445,6 @@ Call context:
     }
     _getEventHandler(identityProviderUrl, options) {
       return async (event) => {
-        var _a, _b, _c;
         if (event.origin !== identityProviderUrl.origin) {
           return;
         }
@@ -4484,33 +4453,32 @@ Call context:
           case "authorize-ready": {
             const request = {
               kind: "authorize-client",
-              sessionPublicKey: new Uint8Array((_a = this._key) == null ? void 0 : _a.getPublicKey().toDer()),
-              maxTimeToLive: options == null ? void 0 : options.maxTimeToLive,
-              allowPinAuthentication: options == null ? void 0 : options.allowPinAuthentication,
-              derivationOrigin: (_b = options == null ? void 0 : options.derivationOrigin) == null ? void 0 : _b.toString(),
+              sessionPublicKey: new Uint8Array(this._key?.getPublicKey().toDer()),
+              maxTimeToLive: options?.maxTimeToLive,
+              allowPinAuthentication: options?.allowPinAuthentication,
+              derivationOrigin: options?.derivationOrigin?.toString(),
               // Pass any custom values to the IDP.
-              ...options == null ? void 0 : options.customValues
+              ...options?.customValues
             };
-            (_c = this._idpWindow) == null ? void 0 : _c.postMessage(request, identityProviderUrl.origin);
+            this._idpWindow?.postMessage(request, identityProviderUrl.origin);
             break;
           }
           case "authorize-client-success":
             try {
-              await this._handleSuccess(message, options == null ? void 0 : options.onSuccess);
+              await this._handleSuccess(message, options?.onSuccess);
             } catch (err) {
-              this._handleFailure(err.message, options == null ? void 0 : options.onError);
+              this._handleFailure(err.message, options?.onError);
             }
             break;
           case "authorize-client-failure":
-            this._handleFailure(message.text, options == null ? void 0 : options.onError);
+            this._handleFailure(message.text, options?.onError);
             break;
         }
       };
     }
     _handleFailure(errorMessage, onError) {
-      var _a;
-      (_a = this._idpWindow) == null ? void 0 : _a.close();
-      onError == null ? void 0 : onError(errorMessage);
+      this._idpWindow?.close();
+      onError?.(errorMessage);
       this._removeEventListener();
       delete this._idpWindow;
     }
@@ -4542,9 +4510,9 @@ Call context:
     if (!loginOptions && !otherLoginOptions) {
       return void 0;
     }
-    const customValues = (loginOptions == null ? void 0 : loginOptions.customValues) || (otherLoginOptions == null ? void 0 : otherLoginOptions.customValues) ? {
-      ...loginOptions == null ? void 0 : loginOptions.customValues,
-      ...otherLoginOptions == null ? void 0 : otherLoginOptions.customValues
+    const customValues = loginOptions?.customValues || otherLoginOptions?.customValues ? {
+      ...loginOptions?.customValues,
+      ...otherLoginOptions?.customValues
     } : void 0;
     return {
       ...loginOptions,
@@ -4565,11 +4533,8 @@ Call context:
     const serialized = toStoredKey(key);
     await storage.set(KEY_STORAGE_KEY, serialized);
   }
-  return __toCommonJS(bundle_auth_entry_exports);
+  return __toCommonJS(icp_sdk_auth_client_entry_exports);
 })();
-
-// Ensure global availability when loaded via ESM/CommonJS bundlers.
-globalThis.DfinityAuthClient = DfinityAuthClient;
 /*! Bundled license information:
 
 @noble/hashes/esm/utils.js:
@@ -4582,3 +4547,9 @@ globalThis.DfinityAuthClient = DfinityAuthClient;
 @noble/curves/esm/ed25519.js:
   (*! noble-curves - MIT License (c) 2022 Paul Miller (paulmillr.com) *)
 */
+
+
+// Ensure global availability when loaded via ESM/CommonJS bundlers.
+;globalThis.DfinityAuthClient = DfinityAuthClient;
+
+//# sourceMappingURL=icp-sdk-auth-client.js.map

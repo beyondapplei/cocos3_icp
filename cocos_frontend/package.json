@@ -27,6 +27,7 @@
   },
   "scripts": {
     "debug": "npx http-server build/web-mobile -p 8080 -c-1",
+    "build:icp-sdk": "node ./tools/build-icp-sdk.mjs",
     "sync:lib3": "node ./tools/sync-lib3.mjs"
   }
 }
