@@ -1,4 +1,4 @@
-import './Polyfill';
+
 import { _decorator } from 'cc';
 import BackManager from "./BackManager";
 import UIManager from "../mg/UIManager";

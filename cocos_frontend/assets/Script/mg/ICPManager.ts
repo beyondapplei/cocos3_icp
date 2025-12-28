@@ -1,8 +1,6 @@
 // // Revert to bundled file
 
 import * as cc from 'cc';
-
-import './Polyfill';
 import { _decorator } from 'cc';
 import UIManager from "../mg/UIManager";
 import LoginManager from "./LoginManager";

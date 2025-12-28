@@ -1,7 +1,5 @@
 
 import * as cc from 'cc';
-
-import './Polyfill';
 import { _decorator } from 'cc';
 import LoginManager from "./LoginManager";
 import { idlFactoryBack } from "./backend.did";

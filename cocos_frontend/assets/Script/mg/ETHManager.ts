@@ -1,5 +1,4 @@
 import { _decorator } from 'cc';
-import './Polyfill';
 import UIManager from "../mg/UIManager";
 import LoginManager from "./LoginManager";
 import { DFX_NETWORK } from "./DefData";
