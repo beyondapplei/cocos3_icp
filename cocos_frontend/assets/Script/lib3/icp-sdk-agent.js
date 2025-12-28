@@ -10257,7 +10257,7 @@ variant ${k2} -> ${e.message}`);
     async #requestAndRetryQuery(args) {
       const { ecid, transformedRequest, body, requestId, backoff: backoff2, tries } = args;
       const delay = tries === 0 ? 0 : backoff2.next();
-      const url = new URL(`/api/v2/canister/${ecid.toString()}/query`, this.host);
+      const url = new URL(`/api/v3/canister/${ecid.toString()}/query`, this.host);
       this.log.print(`fetching "${url.pathname}" with tries:`, {
         tries,
         backoff: backoff2,
@@ -10546,11 +10546,11 @@ variant ${k2} -> ${e.message}`);
         }
         transformedRequest = await this.createReadStateRequest(fields, identity);
       }
-      const url = new URL(`/api/v2/canister/${canister.toString()}/read_state`, this.host);
+      const url = new URL(`/api/v3/canister/${canister.toString()}/read_state`, this.host);
       return await this.#readStateInner(url, { canisterId: canister }, transformedRequest, requestId);
     }
     /**
-     * Reads the state of a subnet from the `/api/v2/subnet/{subnetId}/read_state` endpoint.
+     * Reads the state of a subnet from the `/api/v3/subnet/{subnetId}/read_state` endpoint.
      * @param subnetId The ID of the subnet to read the state of. If you have a canister ID, you can use {@link HttpAgent.getSubnetIdFromCanister | getSubnetIdFromCanister} to get the subnet ID.
      * @param options The options for the read state request.
      * @returns The response from the read state request.
@@ -10558,7 +10558,7 @@ variant ${k2} -> ${e.message}`);
     async readSubnetState(subnetId, options) {
       await this.#rootKeyGuard();
       const subnet = Principal.from(subnetId);
-      const url = new URL(`/api/v2/subnet/${subnet.toString()}/read_state`, this.host);
+      const url = new URL(`/api/v3/subnet/${subnet.toString()}/read_state`, this.host);
       const transformedRequest = await this.createReadStateRequest(options, this.#identity ?? void 0);
       return await this.#readStateInner(url, { subnetId: subnet }, transformedRequest);
     }

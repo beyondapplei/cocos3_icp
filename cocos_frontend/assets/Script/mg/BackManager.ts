@@ -57,6 +57,7 @@ export default class BackManager {
 			isLocal: DFX_NETWORK === 'local',
 			verifyQuerySignatures: false,
 			fetchRootKey: true,
+            forceApiV2: DFX_NETWORK === 'local',
 		});
 
         const Actor = getIcpSdkAgent()?.Actor;

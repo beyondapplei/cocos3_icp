@@ -71,6 +71,7 @@ export default class ICPManager {
 			isLocal: DFX_NETWORK === 'local',
 			verifyQuerySignatures: false,
 			fetchRootKey: true,
+            forceApiV2: DFX_NETWORK === 'local',
 		});
        //如果不是本地环境，不用调用 fetchRootKey
 
