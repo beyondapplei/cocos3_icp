@@ -2,13 +2,12 @@
   "ver": "1.1.50",
   "importer": "prefab",
   "imported": true,
-  "uuid": "461b5247-a00a-4534-884e-ad343c982856",
+  "uuid": "1f4bb279-f14b-4f66-8cbc-89850677ceb8",
   "files": [
     ".json"
   ],
   "subMetas": {},
   "userData": {
-    "syncNodeName": "homepanel",
-    "persistent": false
+    "syncNodeName": "oisyconnectpanel"
   }
 }

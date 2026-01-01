@@ -28,8 +28,8 @@ export enum EUnitType
 
 export enum EUIPanelType
 {
-     LOGIN=1,
-     HOME=2,
+   
+     LOGIN=2,
      GAME=3,
      GAMEEND=4,
      EDIT = 5,
@@ -37,5 +37,6 @@ export enum EUIPanelType
      WALLET = 7,
      WALLET_ICP = 8,
      WALLET_ETH = 9,
+     OISYCONNECTPANEL = 10,
 
 }

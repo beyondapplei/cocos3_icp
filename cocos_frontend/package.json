@@ -11,12 +11,12 @@
     }
   },
   "dependencies": {
+    "@dfinity/oisy-wallet-signer": "^4.1.0",
     "@icp-sdk/auth": "^5.0.0",
     "@icp-sdk/core": "^5.0.0",
     "assert": "^2.1.0",
     "buffer": "^6.0.3",
     "crypto-browserify": "^3.12.1",
-    
     "events": "^3.3.0",
     "process": "^0.11.10",
     "stream-browserify": "^3.0.0",

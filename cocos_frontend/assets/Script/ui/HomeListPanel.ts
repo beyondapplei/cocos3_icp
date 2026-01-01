@@ -73,15 +73,21 @@ export default class HomeListPanel extends UIPanel {
     }
  
     RefreshData() {
+        this.vListData = [];
 
-        let vName = ["多链钱包","veKeys","世界广场","官方singer","oisy-wallet","跨链桥eth-cketh","X402","wallet8","wallet9","wallet10",
+        let vName = ["多链钱包",
+            "ii登录 ",
+            "oisy登录",
+            "官方singer",
+            "veKeys",
+            "跨链桥eth-cketh","X402","wallet8","wallet9","wallet10",
         "wallet11","wallet12","wallet13","wallet14","wallet15","wallet16","wallet17","wallet18","wallet19","wallet20"];
 
        //写个循环创建20个数据
-        for(let i = 1; i <= vName.length; i++) {
+        for(let i = 0; i < vName.length; i++) {
             let cellInfo = new ListCellData();
             cellInfo.nId = i;
-            cellInfo.sName = vName[i-1];
+            cellInfo.sName = vName[i];
             this.vListData.push(cellInfo);
          }
 
@@ -125,14 +131,20 @@ export default class HomeListPanel extends UIPanel {
         let nIndex = btnIcon.nTag;
         cc.log('clickcell='+nIndex);
         let nId = this.vListData[nIndex].nId;
-        if(nId === 1 )
+        if(nId === 0 )
         {
+             UIManager.OpenPanel(EUIPanelType.WALLET);
+        }
+        else if(nId === 1 )
+        {
+            UIManager.OpenPanel(EUIPanelType.LOGIN);
         }
         else if(nId === 2 )
         {
-//           // UIManager.Instance.OpenPanel(EUIPanelType.GAME);
+            //oisy登录
+            UIManager.OpenPanel(EUIPanelType.OISYCONNECTPANEL);
         }
-        UIManager.OpenPanel(EUIPanelType.WALLET);
+       
         
     }
   

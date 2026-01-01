@@ -1,7 +1,6 @@
 number,string,string,number
 nId,strName,strPrefabName,nRemove
-1,LoginPanel,prefab/loginpanel,1
-2,HomePanel,prefab/homepanel,1
+2,LoginPanel,prefab/loginpanel,1
 3,GamePanel,prefab/gamepanel,1
 4,GameEndPanel,prefab/gameendpanel,1
 5,EditPanel,prefab/editpanel,1
@@ -9,3 +8,4 @@ nId,strName,strPrefabName,nRemove
 7,WalletPanel,prefab/walletpanel,1
 8,ICPWalletPanel,prefab/icpwalletpanel,1
 9,ETHWalletPanel,prefab/icpwalletpanel,1
+10,OisyConnectPanel,prefab/oisyconnectpanel,1
