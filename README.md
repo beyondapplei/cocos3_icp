@@ -1,4 +1,4 @@
-# cocos_icp
+# cocos3_icp
 
 这是一个在 Cocos Creator 中集成 ICP (Internet Computer Protocol) 的项目。
 
@@ -14,7 +14,11 @@
    ./deploy-ledger.sh
    ```
 
-3 导出icp-sdk库  node ./tools/build-icp-sdk.mjs  
+3 导出第三方库  
+```
+node ./tools/build-icp-sdk.mjs  
+node ./tools/build-oisy-wallet-signer.mjs
+ ```
 
 3 bash ./local-deploy-app.sh 
 
