@@ -1,7 +1,10 @@
 // OisyManager: minimal wrapper to connect to OISY Wallet Signer
 // Uses dynamic import to avoid top-level bundling when possible.
 
-import { IcpWallet } from '@dfinity/oisy-wallet-signer/icp-wallet';
+//import { IcpWallet } from '@dfinity/oisy-wallet-signer/icp-wallet';
+
+const globalOisyWalletSigner = (window as any).OisyWalletSigner;
+const IcpWallet = globalOisyWalletSigner ? globalOisyWalletSigner.IcpWallet : null;
 
 
 export default class OisyManager {
