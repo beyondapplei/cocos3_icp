@@ -4,7 +4,7 @@ export const idlFactory = ({ IDL }) => {
     'get_eth_public_key' : IDL.Func([], [IDL.Vec(IDL.Nat8)], []),
     'greet' : IDL.Func([IDL.Text], [IDL.Text], ['query']),
     'requestAndSaveEthAddress' : IDL.Func([], [IDL.Text], []),
-    'requestPubkey' : IDL.Func([], [IDL.Text], []),
+    'requestPubkey' : IDL.Func([], [IDL.Vec(IDL.Nat8)], []),
     'setGreeting' : IDL.Func([IDL.Text], [], []),
     'sign' : IDL.Func([IDL.Vec(IDL.Nat8)], [IDL.Vec(IDL.Nat8)], []),
   });

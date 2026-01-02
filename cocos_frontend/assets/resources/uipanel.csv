@@ -9,3 +9,4 @@ nId,strName,strPrefabName,nRemove
 8,ICPWalletPanel,prefab/icpwalletpanel,1
 9,ETHWalletPanel,prefab/icpwalletpanel,1
 10,OisyConnectPanel,prefab/oisyconnectpanel,1
+11,ChainFSPanel,prefab/chainfspanel,1

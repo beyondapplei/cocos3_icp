@@ -1,21 +1,21 @@
 import Principal "mo:base/Principal";
 import Blob "mo:base/Blob";
-//import Cycles "mo:base/ExperimentalCycles";
+import Cycles "mo:base/ExperimentalCycles";
 import Error "mo:base/Error";
 import CFSignerdid "CFSignerdid";
 
 module {
 
   // For local, use dfx canister id signer
-  let signer : CFSignerdid.Service = actor ("grghe-syaaa-aaaar-qabyq-cai");
+  let signer : CFSignerdid.Service = actor ("a3shf-5eaaa-aaaaa-qaafa-cai");
 
   // Helper to determine the key name (dfx_test_key for local, key_1 for mainnet)
   public func getKeyName() : async Text {
-    "key_1" // For mainnet signer canister
+    "dfx_test_key" // For local signer canister
   };
 
-  public func getEthPublicKey( owner : Principal) : async Blob {
-    let derivationPath : [Blob] = [Principal.toBlob(owner)];
+  public func getSelfEthPublicKey() : async Blob {
+    let derivationPath : [Blob] = [];
     let keyName = await getKeyName();
 
     let args : CFSignerdid.EcdsaPublicKeyArgument = {
@@ -25,23 +25,20 @@ module {
     };
 
     let payment : ?CFSignerdid.PaymentType = ?#AttachedCycles;
-
+    Cycles.add(10_000_000_000);
     let res = await signer.generic_caller_ecdsa_public_key(args, payment);
 
     switch (res) {
       case (#Ok response) { response._0_.public_key };
-      case (#Err _err) { throw Error.reject("Error getting public key") };
+      case (#Err _err) { throw Error.reject("Error getting self public key") };
     };
   };
 
-  public func getEthAddress( owner : Principal) : async Text {
-    let request : CFSignerdid.EthAddressRequest = {
-      principal = ?owner;
-    };
+  public func getEthAddress() : async Text {
 
     let payment : ?CFSignerdid.PaymentType = ?#AttachedCycles;
-
-    let res = await signer.eth_address(request, payment);
+    Cycles.add(10_000_000_000);
+    let res = await signer.eth_address_of_caller( payment);
 
     switch (res) {
       case (#Ok response) { response.address };

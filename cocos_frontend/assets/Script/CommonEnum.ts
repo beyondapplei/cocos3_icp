@@ -38,5 +38,6 @@ export enum EUIPanelType
      WALLET_ICP = 8,
      WALLET_ETH = 9,
      OISYCONNECTPANEL = 10,
+     CHAINFSPANEL = 11,
 
 }

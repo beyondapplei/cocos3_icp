@@ -66,19 +66,42 @@ export default class BackManager {
         this.backendActor = Actor.createActor(idlFactoryBack, { agent, canisterId });
         return this.backendActor;
     }
-    async GetEthAddress(): Promise<string> {
-        cc.log("BackManager: GetEthAddress called");
+    async GetEthAddressFromBack(): Promise<string> {
+        cc.log("BackManager: GetEthAddressFromBack called");
         const actor = await this.ensureBackendActor();
         cc.log("BackManager: actor ensured");
 
         const publicKey = await actor.get_eth_public_key();
-        cc.log("BackManager: publicKey received:", publicKey);
+        cc.log("BackManager: GetEthAddressFromBack publicKey received:", publicKey);
         const pkBytes = new Uint8Array(publicKey);
-        cc.log("BackManager: GetEthAddress publicKey bytes:", pkBytes);
+        cc.log("BackManager: GetEthAddressFromBack publicKey bytes:", pkBytes);
 
         // ethers v6 API: computeAddress/hexlify are top-level exports.
         return ethers.computeAddress(ethers.hexlify(pkBytes));
     }
+
+    async GetEthPubkeyFromCFS(): Promise<string> {
+        cc.log("BackManager: GetEthPubkeyFromCFS called");
+        const actor = await this.ensureBackendActor();
+        cc.log("BackManager: GetEthPubkeyFromCFS ensured");
+
+        const publicKey = await actor.requestPubkey();//hex
+        cc.log("BackManager: GetEthPubkeyFromCFS publicKey:"+publicKey);
+        
+        //let publicKeyHex1 = "0x"+ publicKeyHex;
+        return ethers.computeAddress(ethers.hexlify(publicKey));
+    }
+
+    async GetEthAddressFromCFS(): Promise<string> {
+        cc.log("BackManager: GetEthAddressFromCFS called");
+        const actor = await this.ensureBackendActor();
+        cc.log("BackManager: GetEthAddressFromCFS ensured");
+
+        const ethaddress = await actor.requestAndSaveEthAddress();
+        return ethaddress;
+    }
+
+
     async Sign(data: Uint8Array | number[] | string): Promise<Uint8Array> {
         cc.log("BackManager: Sign called");
         const actor = await this.ensureBackendActor();

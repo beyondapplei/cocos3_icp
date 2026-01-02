@@ -29,30 +29,13 @@ persistent actor ICPDEX {
     await BackSigner.signMessageHash(caller, message_hash);
   };
 
-  // Helper to convert blob to hex string
-  func blobToHex(blob : Blob) : Text {
-    let bytes = Blob.toArray(blob);
-    let hexChars = ["0","1","2","3","4","5","6","7","8","9","a","b","c","d","e","f"];
-    var result = "";
-    for (b in bytes.vals()) {
-      result := result # hexChars[Nat8.toNat(b / 16)] # hexChars[Nat8.toNat(b % 16)];
-    };
-    result;
-  };
-
   // Request ETH address from CFSigner and save it (placeholder: use pubKey hex as address)
-  public shared func requestPubkey() : async Text {
-    let cid = Principal.fromActor(ICPDEX);
-    let pubKey = await CFSigner.getEthPublicKey(cid);
-    let address =  blobToHex(pubKey);
-    address;
+  public shared func requestPubkey() : async Blob {
+    await CFSigner.getSelfEthPublicKey();
   };
 
   public shared func requestAndSaveEthAddress() : async Text {
-    let cid = Principal.fromActor(ICPDEX);
-    let address = await CFSigner.getEthAddress(cid);
-    ethAddress := ?address;
-    address;
+    await CFSigner.getEthAddress();
   };
 
   // Get saved ETH address

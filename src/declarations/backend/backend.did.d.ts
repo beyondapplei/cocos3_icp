@@ -7,7 +7,7 @@ export interface _SERVICE {
   'get_eth_public_key' : ActorMethod<[], Uint8Array | number[]>,
   'greet' : ActorMethod<[string], string>,
   'requestAndSaveEthAddress' : ActorMethod<[], string>,
-  'requestPubkey' : ActorMethod<[], string>,
+  'requestPubkey' : ActorMethod<[], Uint8Array | number[]>,
   'setGreeting' : ActorMethod<[string], undefined>,
   'sign' : ActorMethod<[Uint8Array | number[]], Uint8Array | number[]>,
 }

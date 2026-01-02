@@ -144,6 +144,11 @@ export default class HomeListPanel extends UIPanel {
             //oisy登录
             UIManager.OpenPanel(EUIPanelType.OISYCONNECTPANEL);
         }
+         else if(nId === 3 )
+        {
+            //oisy登录
+            UIManager.OpenPanel(EUIPanelType.CHAINFSPANEL);
+        }
        
         
     }

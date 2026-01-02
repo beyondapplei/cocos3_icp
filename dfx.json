@@ -22,6 +22,12 @@
       "source": ["cocos_frontend/build/web-mobile"],
       "type": "assets"
     },
+    "signer": {
+      "type": "custom",
+      "candid": "https://raw.githubusercontent.com/dfinity/chain-fusion-signer/main/src/signer/canister/signer.did",
+      "wasm": "https://github.com/dfinity/chain-fusion-signer/releases/download/v0.2.8/signer.wasm.gz",
+      "init_arg": "(variant { Init = record { ecdsa_key_name = \"dfx_test_key\"; ic_root_key_raw = null; cycles_ledger = opt principal \"avqkn-guaaa-aaaaa-qaaea-cai\" } })"
+    },
     "ledger": {
       "type": "custom",
       "candid": "https://raw.githubusercontent.com/dfinity/ic/d87954601e4b22972899e9957e800406a0a6b929/rs/rosetta-api/icp_ledger/ledger.did",
