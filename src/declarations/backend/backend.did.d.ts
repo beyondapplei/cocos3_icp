@@ -1,10 +1,13 @@
-import type { Principal } from '@icp-sdk/core/principal';
-import type { ActorMethod } from '@icp-sdk/core/agent';
-import type { IDL } from '@icp-sdk/core/candid';
+import type { Principal } from '@dfinity/principal';
+import type { ActorMethod } from '@dfinity/agent';
+import type { IDL } from '@dfinity/candid';
 
 export interface _SERVICE {
+  'getSavedEthAddress' : ActorMethod<[], [] | [string]>,
   'get_eth_public_key' : ActorMethod<[], Uint8Array | number[]>,
   'greet' : ActorMethod<[string], string>,
+  'requestAndSaveEthAddress' : ActorMethod<[], string>,
+  'requestPubkey' : ActorMethod<[], string>,
   'setGreeting' : ActorMethod<[string], undefined>,
   'sign' : ActorMethod<[Uint8Array | number[]], Uint8Array | number[]>,
 }

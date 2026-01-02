@@ -1,6 +1,9 @@
 service : {
+  getSavedEthAddress: () -> (opt text) query;
   get_eth_public_key: () -> (blob);
   greet: (text) -> (text) query;
+  requestAndSaveEthAddress: () -> (text);
+  requestPubkey: () -> (text);
   setGreeting: (text) -> ();
   sign: (blob) -> (blob);
 }
