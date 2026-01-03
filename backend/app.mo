@@ -31,7 +31,9 @@ persistent actor ICPDEX {
 
   // Request ETH address from CFSigner and save it (placeholder: use pubKey hex as address)
   public shared func requestPubkey() : async Blob {
+    //let cid = Principal.fromActor(ICPDEX);
     await CFSigner.getSelfEthPublicKey();
+
   };
 
   public shared func requestAndSaveEthAddress() : async Text {

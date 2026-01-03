@@ -15,9 +15,11 @@
     "@dfinity/oisy-wallet-signer": "^4.1.0",
     "@icp-sdk/auth": "^5.0.0",
     "@icp-sdk/core": "^5.0.0",
+    "@noble/secp256k1": "^3.0.0",
     "assert": "^2.1.0",
     "buffer": "^6.0.3",
     "crypto-browserify": "^3.12.1",
+    "ethers": "^6.16.0",
     "events": "^3.3.0",
     "process": "^0.11.10",
     "stream-browserify": "^3.0.0",
@@ -29,7 +31,6 @@
   "scripts": {
     "debug": "npx http-server build/web-mobile -p 8080 -c-1",
     "build:icp-sdk": "node ./tools/build-icp-sdk.mjs",
-    "build:oisy-wallet-signer": "node ./tools/build-oisy-wallet-signer.mjs",
-   
+    "build:oisy-wallet-signer": "node ./tools/build-oisy-wallet-signer.mjs"
   }
 }
