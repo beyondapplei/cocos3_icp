@@ -35,7 +35,13 @@ node ./tools/build-oisy-wallet-signer.mjs
 
 
 
+eth::eth_address 内部取公钥时走的是：
+* Schema::Eth.derivation_path(principal)也就是派生路径前两段固定是：[ [0x01], [caller_principal_bytes] ]
 
+generic_caller_ecdsa_public_key 用的是 Generic schema 的派生路径
+* Schema::Generic.derivation_path_ending_in(&ic_cdk::caller(), arg.derivation_path)
+也就是说最终派生路径变成：[ [0xff], [caller_principal_bytes] ] + 你传入的 ending
+你传空数组，就等于只用 [0xff, caller] 这条路径，和 [0x01, caller]（Eth schema）完全不同，因此公钥不同、地址不同
 
 
 

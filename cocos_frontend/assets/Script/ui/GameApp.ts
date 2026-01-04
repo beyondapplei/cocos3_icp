@@ -30,6 +30,8 @@ export default class GameApp extends cc.Component {
         EventManager.Instance.Init();
         AppManager.Instance.Init();
 
+        cc.profiler.hideStats();
+
     }
     onLoad(){
         

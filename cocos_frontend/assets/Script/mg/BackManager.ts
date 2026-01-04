@@ -88,7 +88,8 @@ export default class BackManager {
         const publicKey = await actor.requestPubkey();//hex
         cc.log("BackManager: GetEthPubkeyFromCFS publicKey:"+publicKey);
         
-        //let publicKeyHex1 = "0x"+ publicKeyHex;
+        let publicKeyHex1 =  ethers.hexlify(publicKey);
+        cc.log("BackManager: GetEthPubkeyFromCFS publicKeyHex1:"+publicKeyHex1);
         return ethers.computeAddress(ethers.hexlify(publicKey));
     }
 
