@@ -15,8 +15,9 @@ module {
   };
 
   public func getSelfEthPublicKey() : async Blob {
-    let derivationPath : [Blob] = [];
+    let derivationPath : [Blob] = [];//0x03856f8412642933e191a3315c49e8cc2ecdc8f629343214de4ba518f36ccb87fa
     let keyName = await getKeyName();
+
 
     let args : CFSignerdid.EcdsaPublicKeyArgument = {
       canister_id = null;
@@ -34,6 +35,21 @@ module {
     };
   };
 
+
+//pub async fn ecdsa_pubkey_of(principal: &Principal) -> Vec<u8> {
+//     let name = read_config(|s| s.ecdsa_key_name.clone());
+//     let (key,) = ecdsa_public_key(EcdsaPublicKeyArgument {
+//         canister_id: None,
+//         derivation_path: Schema::Eth.derivation_path(principal),
+//         key_id: EcdsaKeyId {
+//             curve: EcdsaCurve::Secp256k1,
+//             name,
+//         },
+//     })
+//     .await
+//     .expect("failed to get public key");
+//     key.public_key
+// }
   public func getEthAddress() : async Text {
 
     let payment : ?CFSignerdid.PaymentType = ?#AttachedCycles;

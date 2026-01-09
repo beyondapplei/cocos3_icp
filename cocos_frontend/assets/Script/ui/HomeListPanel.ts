@@ -45,7 +45,10 @@ export default class HomeListPanel extends UIPanel {
     editBox: cc.EditBox;
     nIndexReq: number;
     nOrderState: number;
+
     onLoad(){
+
+      
         
 
         this.tableview = this.node.getChildByName('tableview').getComponent(TableView);
@@ -79,8 +82,11 @@ export default class HomeListPanel extends UIPanel {
             "ii登录 ",
             "oisy登录",
             "官方singer",
-            "veKeys",
-            "跨链桥eth-cketh","X402","wallet8","wallet9","wallet10",
+            "oisy connect",
+            "k线对比",
+            "X402",
+            "wallet8",
+            "wallet9","wallet10",
         "wallet11","wallet12","wallet13","wallet14","wallet15","wallet16","wallet17","wallet18","wallet19","wallet20"];
 
        //写个循环创建20个数据
@@ -148,6 +154,11 @@ export default class HomeListPanel extends UIPanel {
         {
             //oisy登录
             UIManager.OpenPanel(EUIPanelType.CHAINFSPANEL);
+        }
+        else if(nId === 5 )
+        {
+            //
+            UIManager.OpenPanel(EUIPanelType.KLINEPANEL);
         }
        
         

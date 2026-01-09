@@ -9,7 +9,7 @@ import { DFX_NETWORK, LEAGER_ICP_ID_LOCAL } from "./DefData";
 import { createIcpAgent } from './IcpAgentFactory';
 
 
-import { idlFactoryLedger } from "./icp_ledger.did";
+import { idlFactoryLedger } from "../did/icp_ledger.did";
 
 function getIcpSdkAgent(): any {
     const mod = (globalThis as any)?.DfinityAgent;

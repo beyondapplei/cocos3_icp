@@ -2,7 +2,7 @@
 import * as cc from 'cc';
 import { _decorator } from 'cc';
 import LoginManager from "./LoginManager";
-import { idlFactoryBack } from "./backend.did";
+import { idlFactoryBack } from "../did/backend.did";
 
 import { BACKEND_CANISTER_ID_LOCAL_FALLBACK, DFX_NETWORK } from "./DefData";
 import { createIcpAgent } from './IcpAgentFactory';
