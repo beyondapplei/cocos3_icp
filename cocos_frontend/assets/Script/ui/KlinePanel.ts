@@ -6,7 +6,8 @@ import UIPanel from "./UIPanel"
 import UIManager from "../mg/UIManager";
 import {TableView,CellData} from "./TableView";
 import {ECMDID, ESceneType, EUIPanelType, EUnitType} from "../CommonEnum";
-import KlineManager from '../mg/KlineManager';
+import KlineManager, { CoinPercentData } from '../mg/KlineManager';
+
 
 
 class KLineCell extends CellData{
@@ -18,18 +19,21 @@ class KLineCell extends CellData{
     labPriceHi:cc.Label;
     labPriceScale:cc.Label;
     labCap:cc.Label;
+    labRank:cc.Label;
 
     init(node){
         this.node = node;
         this.btnIcon = this.node.getChildByName('btnicon').getComponent(cc.Button);
         this.labName = this.btnIcon.node.getChildByName('labelname').getComponent(cc.Label);
         this.labCap = this.btnIcon.node.getChildByName('labelcap').getComponent(cc.Label);
+        this.labRank = this.btnIcon.node.getChildByName('labelrank').getComponent(cc.Label);
         const uiTrans = this.node.getComponent(cc.UITransform);
         this.nOldBgHeight = uiTrans ? uiTrans.height : 0;
     }
-    refreshUI(info: ListCellData){
+    refreshUI(info: CoinPercentData){
         this.labName.string = info.sName;//sName
-        this.labCap.string = info.nId.toString()
+        this.labCap.string = info.nPercent.toString()
+        this.labRank.string = info.nId.toString();
     }
 }
 
@@ -56,6 +60,11 @@ export default class KlinePanel extends UIPanel{
     labelVolume: cc.Label;
 
     tableview: TableView;
+
+
+    vCoinRankData: CoinPercentData[] = [];
+
+
     onLoad(){
        
 
@@ -84,7 +93,24 @@ export default class KlinePanel extends UIPanel{
     OnOpen( strParam: string)
     {
         
-        KlineManager.Instance.requireCoinLineData()
+        //KlineManager.Instance.requireCoinLineData()
+
+        // 转换日期字符串到时间戳
+        const startDateStr = "20251231";
+        const endDateStr = "20260110";
+        
+        const startYear = parseInt(startDateStr.substring(0, 4));
+        const startMonth = parseInt(startDateStr.substring(4, 6)) - 1; // 月份从 0 开始
+        const startDay = parseInt(startDateStr.substring(6, 8));
+        const startdate: number = new Date(startYear, startMonth, startDay).getTime()/1000;
+        
+        const endYear = parseInt(endDateStr.substring(0, 4));
+        const endMonth = parseInt(endDateStr.substring(4, 6)) - 1;
+        const endDay = parseInt(endDateStr.substring(6, 8));
+        const enddate: number = new Date(endYear, endMonth, endDay).getTime()/1000;
+        
+        this.vCoinRankData = KlineManager.Instance.GetRankStartToEnd(startdate, enddate);
+        this.tableview.reloadData(this.vCoinRankData.length);
     
     }
 
@@ -105,7 +131,7 @@ export default class KlinePanel extends UIPanel{
             cellData.btnIcon.node.on(cc.Node.EventType.TOUCH_END, this.clickCell.bind(this,cellData.btnIcon),this);
         }
         cc.log('refreshCell'+nIndex);
-        let cellInfo = this.vListData[nIndex];
+        let cellInfo = this.vCoinRankData[nIndex];
         cellData.refreshUI(cellInfo);
         cellData.btnIcon.nTag = nIndex;
         
@@ -118,7 +144,9 @@ export default class KlinePanel extends UIPanel{
 
   
 
-  
+  clickCell(){
+
+  }
 
     onBackClick() {
         UIManager.Instance.closePanel(EUIPanelType.HOMELIST);

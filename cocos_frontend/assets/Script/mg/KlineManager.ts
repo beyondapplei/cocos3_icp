@@ -4,7 +4,7 @@ import { _decorator } from 'cc';
 import LoginManager from "./LoginManager";
 import { idlFactoryKline } from "../did/kline.did";
 
-import { BACKEND_CANISTER_ID_LOCAL_FALLBACK, DFX_NETWORK } from "./DefData";
+import {  DFX_NETWORK } from "./DefData";
 import { createIcpAgent } from './IcpAgentFactory';
 
 export const KLINE_CID = "kvpy3-faaaa-aaaaf-qb7aq-cai";
@@ -16,17 +16,25 @@ function getIcpSdkAgent(): any {
     return mod;
 }
 
-class DayLineData {
+export class DayLineData {
     date: number;
     closing_price: number;
 
 }
 
-class CoinLineData{
+export class CoinLineData{
     nId:number;
     sName: string;
     vPrice: DayLineData[] = [];
 
+}
+
+export class CoinPercentData{
+    nId:number;
+    sName: string;
+    nPercent: number;
+    nStartPrice: number;
+    nEndPrice: number;
 }
 
 export default class KlineManager {
@@ -34,6 +42,7 @@ export default class KlineManager {
     private constructor() {}
     private klineActor: any = null;
     Init() {
+        this.requireCoinLineData();
 
     }
     private vcurrencies: string[] = [];
@@ -41,34 +50,105 @@ export default class KlineManager {
     private vCoinData: CoinLineData[] = [];
     private mapCoinData: Map<string, CoinLineData> = new Map<string, CoinLineData>();
 
+    getCoinDataArray(nstartTime:number, nendTime:number): CoinLineData[] {
+
+        const vCoinD: CoinLineData[] = [];
+
+        for(const coindata of this.vCoinData){
+            
+            const vFilteredPrices: DayLineData[] = [];
+        
+            for(const daydata of coindata.vPrice){
+                if(daydata.date >= nstartTime && daydata.date <= nendTime){
+                    vFilteredPrices.push(daydata);
+                }
+            }
+
+            const coinLineData = new CoinLineData();
+            coinLineData.sName = coindata.sName;
+            coinLineData.vPrice = vFilteredPrices;
+
+            vCoinD.push(coinLineData);
+        }
+
+        return vCoinD;
+
+    }
+
+    GetRankStartToEnd(nStartTiem:number, nEndTime:number): CoinPercentData[] {
+        
+        const vCoinD: CoinLineData[] = this.getCoinDataArray(nStartTiem, nEndTime);
+        
+        const vCoinPer: CoinPercentData[] = [];
+        for(const coindata of vCoinD){
+            if(coindata.vPrice.length >= 2){
+                const nFirstPrice = coindata.vPrice[0].closing_price;
+                const nLastPrice = coindata.vPrice[coindata.vPrice.length -1].closing_price;
+                const nPercent = ((nLastPrice - nFirstPrice) / nFirstPrice) * 100;
+
+                const coinPerData = new CoinPercentData();
+                coinPerData.sName = coindata.sName;
+                coinPerData.nPercent = parseFloat(nPercent.toFixed(1)); //保留一位小数
+                coinPerData.nStartPrice = nFirstPrice;
+                coinPerData.nEndPrice = nLastPrice;
+                vCoinPer.push(coinPerData);
+            }
+        }
+        
+        vCoinPer.sort((a, b) => b.nPercent - a.nPercent);   
+        for(let i = 0; i < vCoinPer.length; i++){
+            vCoinPer[i].nId = i + 1; //排名从1开始
+        }
+        
+        return vCoinPer;
+    }
+
     getCoinData(): CoinLineData[]{
         return this.vCoinData;
     }
 
+
+
     async requireCoinLineData(){
-        await this.getStoredCurrencies();
+        cc.log("KlineManager: requireCoinLineData start (getAllData version)");
+
+        if (this.vcurrencies.length > 0) {
+            return;
+        }   
+
+        // await this.getStoredCurrencies();
         const actor = await this.ensureKlineActor();
         this.vCoinData = [];
+        this.mapCoinData.clear();
+        this.vcurrencies = [];
 
-        for(const symbol of this.vcurrencies){
-            const vdata = await actor.getCurrencyData(symbol); //返回(IDL.Vec(IDL.Tuple(IDL.Nat, KLineData)))
+        // getAllData returns all symbols and their kline data
+        const allData = await actor.getAllData();
+
+        for(const item of allData){
+            const symbol = item[0];
+            const vdata = item[1];
+            this.vcurrencies.push(symbol);
+
             if(vdata && vdata.length > 0){
                
                 const coindata = new CoinLineData();
-
-                for(const item of vdata){
-                    const daydata = new DayLineData();
-                    daydata.date = Number(item[0]);
-                    daydata.closing_price = Number(item[1].close);
-                    coindata.vPrice.push(daydata);
-                    cc.log('requireCoinLineData symbol='+symbol+' date='+daydata.date+' close='+daydata.closing_price);
-                }
-
                 coindata.nId = this.vCoinData.length + 1;
                 coindata.sName = symbol;
-            
-                
+
+                for(const dayItem of vdata){
+                    const daydata = new DayLineData();
+                    daydata.date = Number(dayItem[0]);
+                    // Check if dayItem[1] is object or value. Based on error trace it is value (IDL.Nat)
+                    // If it was record { close: Nat }, then dayItem[1].close.
+                    // But kline.did.ts says Tuple(Nat, Nat).
+                    daydata.closing_price = Number(dayItem[1]);
+                    coindata.vPrice.push(daydata);
+                    cc.log(`KlineManager: symbol=${symbol}, date=${daydata.date}, closing_price=${daydata.closing_price}`); 
+                }
+
                 this.vCoinData.push(coindata);
+                this.mapCoinData.set(symbol, coindata);
             }
         }
 
@@ -111,7 +191,8 @@ export default class KlineManager {
    async getStoredCurrencies(){
 
         const actor = await this.ensureKlineActor();
-        this.vcurrencies = await actor.getStoredCurrencies();
+        const data = await actor.getStoredCurrencies();
+        this.vcurrencies = data.map((d: any) => d[0]);
 
     }
 
