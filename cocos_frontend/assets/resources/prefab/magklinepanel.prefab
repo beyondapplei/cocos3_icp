@@ -1,7 +1,7 @@
 [
   {
     "__type__": "cc.Prefab",
-    "_name": "icpwalletpanel",
+    "_name": "magklinepanel",
     "_objFlags": 0,
     "__editorExtras__": {},
     "_native": "",
@@ -13,7 +13,7 @@
   },
   {
     "__type__": "cc.Node",
-    "_name": "icpwalletpanel",
+    "_name": "magklinepanel",
     "_objFlags": 0,
     "__editorExtras__": {},
     "_parent": null,
@@ -154,8 +154,8 @@
     "_dstBlendFactor": 4,
     "_color": {
       "__type__": "cc.Color",
-      "r": 255,
-      "g": 255,
+      "r": 70,
+      "g": 77,
       "b": 255,
       "a": 255
     },
@@ -216,7 +216,7 @@
     "_contentSize": {
       "__type__": "cc.Size",
       "width": 1206,
-      "height": 2622
+      "height": 2262
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -368,9 +368,9 @@
       "__id__": 13
     },
     "_lineHeight": 100,
-    "_string": "send",
+    "_string": "同步",
     "_horizontalAlign": 1,
-    "_verticalAlign": 0,
+    "_verticalAlign": 1,
     "_fontSize": 100,
     "_fontColor": {
       "__type__": "cc.Color",
@@ -1126,9 +1126,9 @@
     "_dstBlendFactor": 4,
     "_color": {
       "__type__": "cc.Color",
-      "r": 187,
-      "g": 0,
-      "b": 0,
+      "r": 255,
+      "g": 255,
+      "b": 255,
       "a": 255
     },
     "_spriteFrame": null,
@@ -1328,7 +1328,7 @@
       "b": 255,
       "a": 255
     },
-    "_string": "pid",
+    "_string": "20260101",
     "_horizontalAlign": 0,
     "_verticalAlign": 1,
     "_actualFontSize": 100,
@@ -1554,7 +1554,7 @@
     "_string": "Enter text here...",
     "_horizontalAlign": 0,
     "_verticalAlign": 1,
-    "_actualFontSize": 0,
+    "_actualFontSize": 20,
     "_fontSize": 20,
     "_fontFamily": "Arial",
     "_lineHeight": 25,
@@ -1716,7 +1716,7 @@
       "__id__": 66
     },
     "_returnType": 0,
-    "_string": "pid",
+    "_string": "20260101",
     "_tabIndex": 0,
     "_backgroundImage": null,
     "_inputFlag": 5,
@@ -1793,8 +1793,8 @@
     "_color": {
       "__type__": "cc.Color",
       "r": 255,
-      "g": 20,
-      "b": 20,
+      "g": 255,
+      "b": 255,
       "a": 255
     },
     "_spriteFrame": null,
@@ -2102,7 +2102,7 @@
       "__id__": 84
     },
     "_children": [],
-    "_active": false,
+    "_active": true,
     "_components": [
       {
         "__id__": 96
@@ -2174,10 +2174,10 @@
       "b": 255,
       "a": 255
     },
-    "_string": "",
+    "_string": "20260110",
     "_horizontalAlign": 0,
     "_verticalAlign": 1,
-    "_actualFontSize": 0,
+    "_actualFontSize": 100,
     "_fontSize": 100,
     "_fontFamily": "Arial",
     "_lineHeight": 100,
@@ -2325,7 +2325,7 @@
       "__id__": 84
     },
     "_children": [],
-    "_active": true,
+    "_active": false,
     "_components": [
       {
         "__id__": 106
@@ -2562,7 +2562,7 @@
       "__id__": 106
     },
     "_returnType": 0,
-    "_string": "",
+    "_string": "20260110",
     "_tabIndex": 0,
     "_backgroundImage": null,
     "_inputFlag": 5,

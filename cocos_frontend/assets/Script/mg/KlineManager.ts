@@ -25,7 +25,7 @@ export class DayLineData {
 export class CoinLineData{
     nId:number;
     sName: string;
-    vPrice: DayLineData[] = [];
+    mapPrice: Map<number, DayLineData> = new Map<number, DayLineData>();
 
 }
 
@@ -45,7 +45,7 @@ export default class KlineManager {
         this.requireCoinLineData();
 
     }
-    private vcurrencies: string[] = [];
+    vcurrencies: string[] = [];
 
     private vCoinData: CoinLineData[] = [];
     private mapCoinData: Map<string, CoinLineData> = new Map<string, CoinLineData>();
@@ -58,7 +58,7 @@ export default class KlineManager {
             
             const vFilteredPrices: DayLineData[] = [];
         
-            for(const daydata of coindata.vPrice){
+            for(const daydata of coindata.mapPrice.values()){
                 if(daydata.date >= nstartTime && daydata.date <= nendTime){
                     vFilteredPrices.push(daydata);
                 }
@@ -66,7 +66,10 @@ export default class KlineManager {
 
             const coinLineData = new CoinLineData();
             coinLineData.sName = coindata.sName;
-            coinLineData.vPrice = vFilteredPrices;
+            coinLineData.mapPrice = new Map<number, DayLineData>();
+            for (const dayData of vFilteredPrices) {
+                coinLineData.mapPrice.set(dayData.date, dayData);
+            }
 
             vCoinD.push(coinLineData);
         }
@@ -81,9 +84,9 @@ export default class KlineManager {
         
         const vCoinPer: CoinPercentData[] = [];
         for(const coindata of vCoinD){
-            if(coindata.vPrice.length >= 2){
-                const nFirstPrice = coindata.vPrice[0].closing_price;
-                const nLastPrice = coindata.vPrice[coindata.vPrice.length -1].closing_price;
+            if(coindata.mapPrice.size >= 2){
+                const nFirstPrice = coindata.mapPrice.values().next().value.closing_price;
+                const nLastPrice = Array.from(coindata.mapPrice.values())[coindata.mapPrice.size -1].closing_price;
                 const nPercent = ((nLastPrice - nFirstPrice) / nFirstPrice) * 100;
 
                 const coinPerData = new CoinPercentData();
@@ -107,6 +110,28 @@ export default class KlineManager {
         return this.vCoinData;
     }
 
+    async saveKLineData(symbol: string, nstartTime:number, nendTime:number, vdata: [bigint, bigint][]): Promise<void> {
+        const actor = await this.ensureKlineActor();
+        await actor.storeKLineData(symbol, vdata);
+    }
+
+    async GetKLineDataBySymbol(symbol: string, nstartTime:number, nendTime:number): Promise<DayLineData[]> {
+        const vDayLineData: DayLineData[] = [];
+        const actor = await this.ensureKlineActor();
+
+        const vdata = await actor.getKLineData(symbol, BigInt(nstartTime), BigInt(nendTime));
+
+        for(const dayItem of vdata){
+            const daydata = new DayLineData();
+            daydata.date = Number(dayItem[0]);
+            // Check if dayItem[1] is object or value. Based on error trace it is value (IDL.Nat)
+            // If it was record { close: Nat }, then dayItem[1].close.
+            // But kline.did.ts says Tuple(Nat, Nat).
+            daydata.closing_price = Number(dayItem[1])/10000; //后端存的是放大了10000倍的价格
+            vDayLineData.push(daydata);
+        }
+        return vDayLineData;
+    }
 
 
     async requireCoinLineData(){
@@ -116,7 +141,7 @@ export default class KlineManager {
             return;
         }   
 
-        // await this.getStoredCurrencies();
+        
         const actor = await this.ensureKlineActor();
         this.vCoinData = [];
         this.mapCoinData.clear();
@@ -143,8 +168,10 @@ export default class KlineManager {
                     // If it was record { close: Nat }, then dayItem[1].close.
                     // But kline.did.ts says Tuple(Nat, Nat).
                     daydata.closing_price = Number(dayItem[1]);
-                    coindata.vPrice.push(daydata);
-                    cc.log(`KlineManager: symbol=${symbol}, date=${daydata.date}, closing_price=${daydata.closing_price}`); 
+                    coindata.mapPrice.set(daydata.date, daydata);
+
+                    let strDateTime = this.datestampToString(daydata.date);
+                    cc.log(`KlineManager: symbol=${symbol}, date=${strDateTime}, closing_price=${daydata.closing_price}`); 
                 }
 
                 this.vCoinData.push(coindata);
@@ -153,6 +180,9 @@ export default class KlineManager {
         }
 
     }
+
+
+
 
 
 
@@ -188,13 +218,30 @@ export default class KlineManager {
         return this.klineActor;
     }
 
-   async getStoredCurrencies(){
 
-        const actor = await this.ensureKlineActor();
-        const data = await actor.getStoredCurrencies();
-        this.vcurrencies = data.map((d: any) => d[0]);
 
+    strToDatestamp(dateStr: string): number {
+        
+
+        const year = parseInt(dateStr.substring(0, 4));
+        const month = parseInt(dateStr.substring(4, 6)) - 1; // 月份从 0 开始
+        const day = parseInt(dateStr.substring(6, 8));
+        const date: number = new Date(year, month, day).getTime()/1000;
+        return date;
     }
+
+    //20250112
+    datestampToString(dateStamp: number): string {
+        //把时间戳转换成日期字符串YYYYMMDD
+        const date = new Date(dateStamp * 1000);
+        const year = date.getFullYear();
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const day = date.getDate().toString().padStart(2, '0');
+        return `${year}${month}${day}`;
+
+        
+    }
+
 
     
 

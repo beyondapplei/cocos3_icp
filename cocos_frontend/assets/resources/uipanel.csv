@@ -11,3 +11,4 @@ nId,strName,strPrefabName,nRemove
 10,OisyConnectPanel,prefab/oisyconnectpanel,1
 11,ChainFSPanel,prefab/chainfspanel,1
 12,KlinePanel,prefab/klinepanel,1
+13,MagklinePanel,prefab/magklinepanel,1

@@ -84,7 +84,7 @@ export default class HomeListPanel extends UIPanel {
             "官方singer",
             "oisy connect",
             "k线对比",
-            "X402",
+            "k线管理",
             "wallet8",
             "wallet9","wallet10",
         "wallet11","wallet12","wallet13","wallet14","wallet15","wallet16","wallet17","wallet18","wallet19","wallet20"];
@@ -159,6 +159,11 @@ export default class HomeListPanel extends UIPanel {
         {
             //
             UIManager.OpenPanel(EUIPanelType.KLINEPANEL);
+        }
+        else if(nId === 6 )
+        {
+            //
+            UIManager.OpenPanel(EUIPanelType.MAGKLINEPANEL);
         }
        
         

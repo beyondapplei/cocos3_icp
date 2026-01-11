@@ -99,15 +99,9 @@ export default class KlinePanel extends UIPanel{
         const startDateStr = "20251231";
         const endDateStr = "20260110";
         
-        const startYear = parseInt(startDateStr.substring(0, 4));
-        const startMonth = parseInt(startDateStr.substring(4, 6)) - 1; // 月份从 0 开始
-        const startDay = parseInt(startDateStr.substring(6, 8));
-        const startdate: number = new Date(startYear, startMonth, startDay).getTime()/1000;
-        
-        const endYear = parseInt(endDateStr.substring(0, 4));
-        const endMonth = parseInt(endDateStr.substring(4, 6)) - 1;
-        const endDay = parseInt(endDateStr.substring(6, 8));
-        const enddate: number = new Date(endYear, endMonth, endDay).getTime()/1000;
+    
+        const startdate: number = KlineManager.Instance.strToDatestamp(startDateStr) ;
+        const enddate: number = KlineManager.Instance.strToDatestamp(endDateStr) ;
         
         this.vCoinRankData = KlineManager.Instance.GetRankStartToEnd(startdate, enddate);
         this.tableview.reloadData(this.vCoinRankData.length);
@@ -149,7 +143,7 @@ export default class KlinePanel extends UIPanel{
   }
 
     onBackClick() {
-        UIManager.Instance.closePanel(EUIPanelType.HOMELIST);
+        UIManager.Instance.OpenPanel(EUIPanelType.HOMELIST);
     }
 
     onDestroy() {

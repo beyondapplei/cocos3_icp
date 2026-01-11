@@ -40,5 +40,6 @@ export enum EUIPanelType
      OISYCONNECTPANEL = 10,
      CHAINFSPANEL = 11,
      KLINEPANEL = 12,
+     MAGKLINEPANEL = 13,
 
 }
