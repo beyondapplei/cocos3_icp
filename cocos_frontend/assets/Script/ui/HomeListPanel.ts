@@ -78,14 +78,14 @@ export default class HomeListPanel extends UIPanel {
     RefreshData() {
         this.vListData = [];
 
-        let vName = ["多链钱包",
+        let vName = ["多链钱包", //0
             "ii登录 ",
-            "oisy登录",
+            "oisy登录", //2
             "官方singer",
-            "oisy connect",
-            "k线对比",
-            "k线管理",
-            "wallet8",
+            "oisy connect", //4
+            "涨幅排行榜",
+            "k线数据管理", //6
+            "周期内排行榜",
             "wallet9","wallet10",
         "wallet11","wallet12","wallet13","wallet14","wallet15","wallet16","wallet17","wallet18","wallet19","wallet20"];
 
@@ -164,6 +164,12 @@ export default class HomeListPanel extends UIPanel {
         {
             //
             UIManager.OpenPanel(EUIPanelType.MAGKLINEPANEL);
+        }
+
+        else if(nId === 7 )
+        {
+            //
+           // UIManager.OpenPanel(EUIPanelType.MAGKLINEPANEL);
         }
        
         
